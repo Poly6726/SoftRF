@@ -230,7 +230,7 @@ static void EPD_Draw_Text()
       } else if ((int) RelativeVertical < -50) {
         strcat(info_line, "below");
       } else {
-        strcpy(info_line, "  same alt."); 
+        strcpy(info_line, "  same alt.");
       }
 
       display->getTextBounds(info_line, 0, 0, &tbx, &tby, &tbw, &tbh);

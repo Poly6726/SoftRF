@@ -5,6 +5,7 @@
 
 DIY, multi-functional, compatible, sub-1 GHz ISM band radio based proximity awareness system for general aviation.
 
+[<img src="https://github.com/lyusupov/SoftRF/raw/master/documents/images/Concorde-banner.jpg">](https://github.com/lyusupov/SoftRF/wiki/Concorde-Edition)
 [<img src="https://github.com/lyusupov/SoftRF/raw/master/documents/images/Solaris-banner.jpg">](https://github.com/lyusupov/SoftRF/wiki/Solaris-Edition)
 [<img src="https://github.com/lyusupov/SoftRF/raw/master/documents/images/Pocket-banner.jpg">](https://github.com/lyusupov/SoftRF/wiki/Pocket-Edition)
 [<img src="https://github.com/lyusupov/SoftRF/raw/master/documents/images/Airventure-banner.jpg">](https://github.com/lyusupov/SoftRF/wiki/Airventure-Edition)

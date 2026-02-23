@@ -112,6 +112,8 @@ bool setupTouchDrv()
       touchDrv->setPins(-1 /* XL P03 */, -1 /* XL P04 */);
       result = touchDrv->begin(TDP4_IIC_1, GT9895_SLAVE_ADDRESS_L,
                                SOC_GPIO_PIN_TDP4_SDA_1, SOC_GPIO_PIN_TDP4_SCL_1);
+      touchDrv->setMaxCoordinates(panel->getLCD()->getFrameWidth(),
+                                  panel->getLCD()->getFrameHeight());
       break;
     case TOUCH_GT911:
     default:
