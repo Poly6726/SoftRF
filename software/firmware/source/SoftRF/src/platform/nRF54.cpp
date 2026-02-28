@@ -41,12 +41,12 @@
 
 // RFM95W pin mapping
 lmic_pinmap lmic_pins = {
-    .nss = LMIC_UNUSED_PIN,
+    .nss = SOC_GPIO_PIN_SS,
     .txe = LMIC_UNUSED_PIN,
     .rxe = LMIC_UNUSED_PIN,
-    .rst = LMIC_UNUSED_PIN,
+    .rst = SOC_GPIO_PIN_RST,
     .dio = {LMIC_UNUSED_PIN, LMIC_UNUSED_PIN, LMIC_UNUSED_PIN},
-    .busy = LMIC_UNUSED_PIN,
+    .busy = SOC_GPIO_PIN_BUSY,
     .tcxo = LMIC_UNUSED_PIN,
 };
 
@@ -59,7 +59,7 @@ static uint32_t bootCount __attribute__ ((section (".noinit")));
 static nRF54_board_id nRF54_board = NRF54_SEEED_XIAO; /* default */
 
 const char *nRF54_Device_Manufacturer = SOFTRF_IDENT;
-const char *nRF54_Device_Model = "Badge Edition";
+const char *nRF54_Device_Model = "Academy Edition";
 
 #if defined(EXCLUDE_EEPROM)
 eeprom_t eeprom_block;
@@ -253,7 +253,7 @@ static void nRF54_EEPROM_extension(int cmd)
 
 static void nRF54_SPI_begin()
 {
-  SPI.begin();
+  SPI.begin(SOC_GPIO_PIN_SS);
 }
 
 static void nRF54_swSer_begin(unsigned long baud)
@@ -340,52 +340,6 @@ static void nRF54_Button_fini()
 
 }
 
-static void nRF54_USB_setup()
-{
-
-}
-
-static void nRF54_USB_loop()
-{
-
-}
-
-static void nRF54_USB_fini()
-{
-
-}
-
-static int nRF54_USB_available()
-{
-  int rval = 0;
-
-  return rval;
-}
-
-static int nRF54_USB_read()
-{
-  int rval = -1;
-
-  return rval;
-}
-
-static size_t nRF54_USB_write(const uint8_t *buffer, size_t size)
-{
-  size_t rval = size;
-
-  return rval;
-}
-
-IODev_ops_t nRF54_USBSerial_ops = {
-  "nRF54 USBSerial",
-  nRF54_USB_setup,
-  nRF54_USB_loop,
-  nRF54_USB_fini,
-  nRF54_USB_available,
-  nRF54_USB_read,
-  nRF54_USB_write
-};
-
 static bool nRF54_ADB_setup()
 {
   return false;
@@ -440,7 +394,7 @@ const SoC_ops_t nRF54_ops = {
   nRF54_swSer_begin,
   nRF54_swSer_enableRx,
   NULL,
-  &nRF54_USBSerial_ops,
+  NULL,
   NULL,
   nRF54_Display_setup,
   nRF54_Display_loop,

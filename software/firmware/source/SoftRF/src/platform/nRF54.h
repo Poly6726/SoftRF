@@ -26,7 +26,7 @@
 /* Maximum of tracked flying objects is now SoC-specific constant */
 #define MAX_TRACKING_OBJECTS    8
 
-#define DEFAULT_SOFTRF_MODEL    SOFTRF_MODEL_BADGE
+#define DEFAULT_SOFTRF_MODEL    SOFTRF_MODEL_ACADEMY
 
 #define isValidFix()            isValidGNSSFix()
 
@@ -37,12 +37,14 @@
 #define uni_Color(r,g,b)        strip.Color(r,g,b)
 #define color_t                 uint32_t
 
-#define PROGMEM
-#define PGM_P                   const char *
-#define PGM_VOID_P              const void *
+//#define PROGMEM
+//#define PGM_P                   const char *
+//#define PGM_VOID_P              const void *
+
 //#define PSTR(s)                 (s)
-#define pgm_read_byte(addr)     (*(const unsigned char *)(addr))
-#define pgm_read_word(addr)     (*(const unsigned short *)(addr))
+
+//#define pgm_read_byte(addr)     (*(const unsigned char *)(addr))
+//#define pgm_read_word(addr)     (*(const unsigned short *)(addr))
 
 extern char *dtostrf_workaround(double, signed char, unsigned char, char *);
 #define dtostrf                 dtostrf_workaround
@@ -85,11 +87,41 @@ struct rst_info {
 #define _PINNUM(port, pin)    ((port)*32 + (pin))
 #endif
 
-#define SOC_GPIO_PIN_STATUS   SOC_UNUSED_PIN
-#define SOC_GPIO_LED_USBMSC   SOC_UNUSED_PIN
-#define SOC_GPIO_LED_BLE      SOC_UNUSED_PIN
-#define SOC_GPIO_PIN_GNSS_PPS SOC_UNUSED_PIN
-#define SOC_GPIO_PIN_BUTTON   SOC_UNUSED_PIN
+/* Peripherals */
+#define SOC_GPIO_PIN_CONS_RX            _PINNUM(1, 8)  // D19, P1.08 +
+#define SOC_GPIO_PIN_CONS_TX            _PINNUM(1, 9)  // D18, P1.09 +
+
+#define SOC_GPIO_PIN_GNSS_RX            _PINNUM(2, 8)  // D7,  P2.08 +
+#define SOC_GPIO_PIN_GNSS_TX            _PINNUM(2, 7)  // D6,  P2.07 +
+#define SOC_GPIO_PIN_GNSS_PPS           _PINNUM(2, 10) // D13, P2.10 +
+
+/* SPI */
+#define SOC_GPIO_PIN_MOSI               _PINNUM(2, 2)  // D10, P2.02 +
+#define SOC_GPIO_PIN_MISO               _PINNUM(2, 4)  // D9,  P2.04 +
+#define SOC_GPIO_PIN_SCK                _PINNUM(2, 6)  // D8,  P2.06 +
+#define SOC_GPIO_PIN_SS                 _PINNUM(1, 7)  // D3,  P1.07 +
+
+/* LR2021 */
+#define SOC_GPIO_PIN_RST                _PINNUM(1, 6)  // D2,  P1.06 +
+#define SOC_GPIO_PIN_DIO7               _PINNUM(2, 7)  // D6,  P2.07 +
+#define SOC_GPIO_PIN_DIO8               _PINNUM(1, 4)  // D0,  P1.04 +
+#define SOC_GPIO_PIN_DIO11              _PINNUM(2, 8)  // D7,  P2.08 +
+#define SOC_GPIO_PIN_BUSY               _PINNUM(1, 5)  // D1,  P1.05 +
+
+/* I2C */
+#define SOC_GPIO_PIN_SDA                _PINNUM(1, 11) // D4,  P1.11 +
+#define SOC_GPIO_PIN_SCL                _PINNUM(1, 12) // D5,  P1.12 +
+
+/* NFC */
+#define SOC_GPIO_PIN_NFC_ANT1           _PINNUM(1,  2) // P1.02 +
+#define SOC_GPIO_PIN_NFC_ANT2           _PINNUM(1,  3) // P1.03 +
+
+/* antenna switch */
+#define SOC_GPIO_PIN_ANT_SW             _PINNUM(2,  5) // P2.05 +
+
+#define SOC_GPIO_PIN_STATUS             _PINNUM(2,  0) // D16, P2.00 +
+#define SOC_GPIO_PIN_BUTTON             _PINNUM(0,  0) // D17, P0.00 +
+#define SOC_GPIO_PIN_BUZZER             SOC_UNUSED_PIN
 
 #define EXCLUDE_EEPROM
 #define EXCLUDE_WIFI
@@ -111,10 +143,10 @@ struct rst_info {
 /* Component                         Cost */
 /* -------------------------------------- */
 //#define USE_NMEALIB            //  +  8 kb
-//#define USE_NMEA_CFG           //  +    kb
+#define USE_NMEA_CFG             //  +    kb
 //#define USE_SKYVIEW_CFG        //  +    kb
 #define EXCLUDE_BMP180           //  -    kb
-#define EXCLUDE_BMP280           //  -    kb
+//#define EXCLUDE_BMP280         //  -    kb
 #define EXCLUDE_BME680           //  -    kb
 #define EXCLUDE_BME280AUX        //  -    kb
 #define EXCLUDE_MPL3115A2        //  -    kb
@@ -124,7 +156,7 @@ struct rst_info {
 #define EXCLUDE_EGM96            //  - 16 kb
 #define EXCLUDE_LED_RING         //  -    kb
 
-//#define USE_BASICMAC
+#define USE_BASICMAC
 //#define EXCLUDE_SX1276         //  -  3 kb
 
 #define USE_TIME_SLOTS
@@ -138,13 +170,13 @@ struct rst_info {
 //#define USE_IBEACON
 #define EXCLUDE_NUS
 #define EXCLUDE_IMU
-//#define USE_OGN_ENCRYPTION
-//#define ENABLE_ADSL
-//#define ENABLE_PROL
+#define USE_OGN_ENCRYPTION
+#define ENABLE_ADSL
+#define ENABLE_PROL
 
-//#define USE_RADIOLIB
+#define USE_RADIOLIB
 #define EXCLUDE_LR11XX
-#define EXCLUDE_LR20XX
+//#define EXCLUDE_LR20XX
 #define EXCLUDE_CC1101
 #define EXCLUDE_SI443X
 #define EXCLUDE_SI446X
@@ -158,8 +190,5 @@ struct rst_info {
 #define PFLAA_EXT1_FMT  ",%d,%d,%d"
 #define PFLAA_EXT1_ARGS ,Container[i].no_track,data_source,Container[i].rssi
 
-#define SOC_GPIO_PIN_BUZZER   SOC_UNUSED_PIN
-
 #endif /* PLATFORM_NRF54_H */
-
 #endif /* ARDUINO_ARCH_NRF54L15CLEAN */
