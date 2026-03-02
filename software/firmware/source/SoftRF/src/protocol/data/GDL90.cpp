@@ -36,7 +36,7 @@
 #include "../../AHRS.h"
 #endif /* ENABLE_AHRS */
 
-#define ADDR_TO_HEX_STR(s, c) (s += ((c) < 0x10 ? "0" : "") + String((c), HEX))
+#define ADDR_TO_HEX_STR(s, c) (s += String((c) < 0x10 ? "0" : "") + String((c), HEX))
 
 static GDL90_Msg_HeartBeat_t HeartBeat;
 static GDL90_Msg_Traffic_t Traffic;

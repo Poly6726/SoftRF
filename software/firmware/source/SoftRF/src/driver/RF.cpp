@@ -65,7 +65,7 @@ String Bin2Hex(byte *buffer, size_t size)
   String str = "";
   for (int i=0; i < size; i++) {
     byte c = buffer[i];
-    str += (c < 0x10 ? "0" : "") + String(c, HEX);
+    str += String(c < 0x10 ? "0" : "") + String(c, HEX);
   }
   return str;
 }

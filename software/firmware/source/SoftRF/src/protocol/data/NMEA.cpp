@@ -28,7 +28,7 @@
 #include "../../driver/Baro.h"
 #include "../../TrafficHelper.h"
 
-#define ADDR_TO_HEX_STR(s, c) (s += ((c) < 0x10 ? "0" : "") + String((c), HEX))
+#define ADDR_TO_HEX_STR(s, c) (s += String((c) < 0x10 ? "0" : "") + String((c), HEX))
 
 #if defined(NMEA_TCP_SERVICE)
 WiFiServer *NmeaTCPServer = NULL;
