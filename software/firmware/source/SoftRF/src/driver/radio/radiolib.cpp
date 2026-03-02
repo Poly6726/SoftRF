@@ -5041,6 +5041,10 @@ static void lr20xx_setup()
 
   switch (hw_info.model)
   {
+  case SOFTRF_MODEL_ACADEMY:
+    radio_g4->irqDioNum = 8; /* DIO8 as IRQ on WIO-2021 */
+    Vtcxo = 0.0; /* XTAL */
+    break;
   default:
     radio_g4->irqDioNum = 11; /* LR2021 DIO11 as IRQ */
     Vtcxo = 1.6;
@@ -5873,4 +5877,3 @@ static void lr20xx_shutdown()
 #endif /* EXCLUDE_LR20XX */
 
 #endif /* USE_RADIOLIB */
-

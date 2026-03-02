@@ -70,7 +70,7 @@ enum rst_reason {
 };
 
 enum nRF54_board_id {
-  NRF54_SEEED_XIAO,
+  NRF54_LR2021EVK1XCS1,
 };
 
 struct rst_info {
@@ -87,41 +87,13 @@ struct rst_info {
 #define _PINNUM(port, pin)    ((port)*32 + (pin))
 #endif
 
-/* Peripherals */
-#define SOC_GPIO_PIN_CONS_RX            _PINNUM(1, 8)  // D19, P1.08 +
-#define SOC_GPIO_PIN_CONS_TX            _PINNUM(1, 9)  // D18, P1.09 +
+#include "iomap/Semtech_LR2021EVK1XCS1.h"
 
-#define SOC_GPIO_PIN_GNSS_RX            _PINNUM(2, 8)  // D7,  P2.08 +
-#define SOC_GPIO_PIN_GNSS_TX            _PINNUM(2, 7)  // D6,  P2.07 +
-#define SOC_GPIO_PIN_GNSS_PPS           _PINNUM(2, 10) // D13, P2.10 +
+#define SOC_GPIO_PIN_GNSS_PPS (hw_info.model == SOFTRF_MODEL_ACADEMY  ? \
+                               SOC_GPIO_PIN_GNSS_EVK_PPS : SOC_UNUSED_PIN)
 
-/* SPI */
-#define SOC_GPIO_PIN_MOSI               _PINNUM(2, 2)  // D10, P2.02 +
-#define SOC_GPIO_PIN_MISO               _PINNUM(2, 4)  // D9,  P2.04 +
-#define SOC_GPIO_PIN_SCK                _PINNUM(2, 6)  // D8,  P2.06 +
-#define SOC_GPIO_PIN_SS                 _PINNUM(1, 7)  // D3,  P1.07 +
-
-/* LR2021 */
-#define SOC_GPIO_PIN_RST                _PINNUM(1, 6)  // D2,  P1.06 +
-#define SOC_GPIO_PIN_DIO7               _PINNUM(2, 7)  // D6,  P2.07 +
-#define SOC_GPIO_PIN_DIO8               _PINNUM(1, 4)  // D0,  P1.04 +
-#define SOC_GPIO_PIN_DIO11              _PINNUM(2, 8)  // D7,  P2.08 +
-#define SOC_GPIO_PIN_BUSY               _PINNUM(1, 5)  // D1,  P1.05 +
-
-/* I2C */
-#define SOC_GPIO_PIN_SDA                _PINNUM(1, 11) // D4,  P1.11 +
-#define SOC_GPIO_PIN_SCL                _PINNUM(1, 12) // D5,  P1.12 +
-
-/* NFC */
-#define SOC_GPIO_PIN_NFC_ANT1           _PINNUM(1,  2) // P1.02 +
-#define SOC_GPIO_PIN_NFC_ANT2           _PINNUM(1,  3) // P1.03 +
-
-/* antenna switch */
-#define SOC_GPIO_PIN_ANT_SW             _PINNUM(2,  5) // P2.05 +
-
-#define SOC_GPIO_PIN_STATUS             _PINNUM(2,  0) // D16, P2.00 +
-#define SOC_GPIO_PIN_BUTTON             _PINNUM(0,  0) // D17, P0.00 +
-#define SOC_GPIO_PIN_BUZZER             SOC_UNUSED_PIN
+#define SOC_GPIO_PIN_STATUS   (hw_info.model == SOFTRF_MODEL_ACADEMY ? \
+                               SOC_GPIO_PIN_EVK_STATUS : SOC_UNUSED_PIN)
 
 #define EXCLUDE_EEPROM
 #define EXCLUDE_WIFI
@@ -155,6 +127,7 @@ struct rst_info {
 #define EXCLUDE_UATM             //  -    kb
 #define EXCLUDE_EGM96            //  - 16 kb
 #define EXCLUDE_LED_RING         //  -    kb
+#define USE_OLED                 //  +  6 kb
 
 #define USE_BASICMAC
 //#define EXCLUDE_SX1276         //  -  3 kb
@@ -189,6 +162,10 @@ struct rst_info {
 /* FTD-012 data port protocol version 8 and 9 */
 #define PFLAA_EXT1_FMT  ",%d,%d,%d"
 #define PFLAA_EXT1_ARGS ,Container[i].no_track,data_source,Container[i].rssi
+
+#if defined(USE_OLED)
+#define U8X8_OLED_I2C_BUS_TYPE  U8X8_SSD1306_128X64_NONAME_HW_I2C
+#endif /* USE_OLED */
 
 #endif /* PLATFORM_NRF54_H */
 #endif /* ARDUINO_ARCH_NRF54L15CLEAN */

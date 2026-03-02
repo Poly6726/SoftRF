@@ -39,14 +39,18 @@
 //#include "../protocol/data/JSON.h"
 #include "../system/Time.h"
 
+#if defined(USE_OLED)
+#include "../driver/OLED.h"
+#endif /* USE_OLED */
+
 // RFM95W pin mapping
 lmic_pinmap lmic_pins = {
-    .nss = SOC_GPIO_PIN_SS,
+    .nss = LMIC_UNUSED_PIN,
     .txe = LMIC_UNUSED_PIN,
     .rxe = LMIC_UNUSED_PIN,
-    .rst = SOC_GPIO_PIN_RST,
+    .rst = LMIC_UNUSED_PIN,
     .dio = {LMIC_UNUSED_PIN, LMIC_UNUSED_PIN, LMIC_UNUSED_PIN},
-    .busy = SOC_GPIO_PIN_BUSY,
+    .busy = LMIC_UNUSED_PIN,
     .tcxo = LMIC_UNUSED_PIN,
 };
 
@@ -56,7 +60,7 @@ static struct rst_info reset_info = {
 
 static uint32_t bootCount __attribute__ ((section (".noinit")));
 
-static nRF54_board_id nRF54_board = NRF54_SEEED_XIAO; /* default */
+static nRF54_board_id nRF54_board = NRF54_LR2021EVK1XCS1; /* default */
 
 const char *nRF54_Device_Manufacturer = SOFTRF_IDENT;
 const char *nRF54_Device_Model = "Academy Edition";
@@ -143,10 +147,20 @@ char *dtostrf_workaround(double number, signed char width, unsigned char prec, c
     return s;
 }
 
-
 static void nRF54_setup()
 {
-
+  switch (nRF54_board)
+  {
+    case NRF54_LR2021EVK1XCS1:
+    default:
+      lmic_pins.nss  = SOC_GPIO_PIN_EVK_SS;
+      lmic_pins.rst  = SOC_GPIO_PIN_EVK_RST;
+      lmic_pins.busy = SOC_GPIO_PIN_EVK_BUSY;
+#if defined(USE_RADIOLIB)
+      lmic_pins.dio[0] = SOC_GPIO_PIN_EVK_DIO8;
+#endif /* USE_RADIOLIB */
+      break;
+  }
 }
 
 static void nRF54_post_init()
@@ -253,7 +267,13 @@ static void nRF54_EEPROM_extension(int cmd)
 
 static void nRF54_SPI_begin()
 {
-  SPI.begin(SOC_GPIO_PIN_SS);
+  switch (nRF54_board)
+  {
+    case NRF54_LR2021EVK1XCS1:
+    default:
+      SPI.begin(SOC_GPIO_PIN_EVK_SS);
+      break;
+  }
 }
 
 static void nRF54_swSer_begin(unsigned long baud)
@@ -268,17 +288,51 @@ static void nRF54_swSer_enableRx(boolean arg)
 
 static byte nRF54_Display_setup()
 {
-  return 0;
+  byte rval = DISPLAY_NONE;
+
+  if (nRF54_board == NRF54_LR2021EVK1XCS1) {
+#if defined(USE_OLED)
+    rval = OLED_setup();
+#endif /* USE_OLED */
+  }
+
+  return rval;
 }
 
 static void nRF54_Display_loop()
 {
+  switch (hw_info.display)
+  {
+#if defined(USE_OLED)
+  case DISPLAY_OLED_1_3:
+  case DISPLAY_OLED_TTGO:
+  case DISPLAY_OLED_HELTEC:
+    OLED_loop();
+    break;
+#endif /* USE_OLED */
 
+  case DISPLAY_NONE:
+  default:
+    break;
+  }
 }
 
 static void nRF54_Display_fini(int reason)
 {
+  switch (hw_info.display)
+  {
+#if defined(USE_OLED)
+  case DISPLAY_OLED_1_3:
+  case DISPLAY_OLED_TTGO:
+  case DISPLAY_OLED_HELTEC:
+    OLED_fini(reason);
+    break;
+#endif /* USE_OLED */
 
+  case DISPLAY_NONE:
+  default:
+    break;
+  }
 }
 
 static void nRF54_Battery_setup()
