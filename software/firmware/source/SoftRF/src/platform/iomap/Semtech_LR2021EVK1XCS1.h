@@ -33,5 +33,10 @@
 #define SOC_GPIO_PIN_EVK_ANT_SW         _PINNUM(2,  5) // P2.05 +
 
 #define SOC_GPIO_PIN_EVK_STATUS         _PINNUM(2,  0) // D16, P2.00 +
-#define SOC_GPIO_PIN_EVK_BUTTON         _PINNUM(0,  0) // D17, P0.00 +
+#define SOC_GPIO_PIN_EVK_BUTTON         _PINNUM(0,  0) // D17, P0.00 +, XIAO
 #define SOC_GPIO_PIN_EVK_BUZZER         SOC_UNUSED_PIN
+
+#define SOC_GPIO_PIN_EVK_D11            _PINNUM(0,  3) // D11, P0.03 +
+#define SOC_GPIO_PIN_EVK_D12            _PINNUM(0,  4) // D12, P0.04 +
+#define SOC_GPIO_PIN_EVK_BUTTON_AUX     _PINNUM(2,  9) // D14, P2.09 +, EVK, NO PULLUP
+#define SOC_GPIO_PIN_EVK_D15            _PINNUM(2,  6) // D15, P2.06 +

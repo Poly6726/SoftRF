@@ -159,6 +159,9 @@ static void nRF54_setup()
 #if defined(USE_RADIOLIB)
       lmic_pins.dio[0] = SOC_GPIO_PIN_EVK_DIO8;
 #endif /* USE_RADIOLIB */
+
+      pinMode(SOC_GPIO_PIN_EVK_STATUS, OUTPUT);
+      digitalWrite(SOC_GPIO_PIN_EVK_STATUS, LED_STATE_ON);
       break;
   }
 }
@@ -379,14 +382,78 @@ static void nRF54_WDT_fini()
 
 }
 
+#include <AceButton.h>
+using namespace ace_button;
+
+AceButton button_1(SOC_UNUSED_PIN);
+
+// The event handler for the button.
+void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
+
+  switch (eventType) {
+    case AceButton::kEventClicked:
+    case AceButton::kEventReleased:
+#if defined(USE_OLED)
+      if (button == &button_1 &&
+         (hw_info.display == DISPLAY_OLED_1_3 ||
+          hw_info.display == DISPLAY_OLED_TTGO)) {
+        OLED_Next_Page();
+      }
+#endif /* USE_OLED */
+      break;
+    case AceButton::kEventDoubleClicked:
+
+      break;
+    case AceButton::kEventLongPressed:
+      if (button == &button_1) {
+        shutdown(SOFTRF_SHUTDOWN_BUTTON);
+        Serial.println(F("This will never be printed."));
+      }
+      break;
+  }
+}
+
+/* Callbacks for push button interrupt */
+void onModeButtonEvent() {
+  button_1.check();
+}
+
 static void nRF54_Button_setup()
 {
+  int mode_button_pin = -1;
 
+  switch (nRF54_board)
+  {
+    case NRF54_LR2021EVK1XCS1:
+    default:
+      mode_button_pin = SOC_GPIO_PIN_EVK_BUTTON;
+      break;
+  }
+
+  // Button(s) uses external pull up resistor.
+  pinMode(mode_button_pin, INPUT);
+
+  // Configure the ButtonConfig with the event handler, and enable all higher
+  // level events.
+  ButtonConfig* ModeButtonConfig = button_1.getButtonConfig();
+  ModeButtonConfig->setEventHandler(handleEvent);
+  ModeButtonConfig->setFeature(ButtonConfig::kFeatureDoubleClick);
+  ModeButtonConfig->setFeature(ButtonConfig::kFeatureLongPress);
+  ModeButtonConfig->setFeature(ButtonConfig::kFeatureSuppressAfterClick);
+  ModeButtonConfig->setFeature(ButtonConfig::kFeatureSuppressAfterDoubleClick);
+  ModeButtonConfig->setFeature(
+                    ButtonConfig::kFeatureSuppressClickBeforeDoubleClick);
+//  ModeButtonConfig->setDebounceDelay(15);
+  ModeButtonConfig->setClickDelay(600);
+  ModeButtonConfig->setDoubleClickDelay(1500);
+  ModeButtonConfig->setLongPressDelay(2000);
+
+//  attachInterrupt(digitalPinToInterrupt(mode_button_pin), onModeButtonEvent, CHANGE );
 }
 
 static void nRF54_Button_loop()
 {
-
+  button_1.check();
 }
 
 static void nRF54_Button_fini()

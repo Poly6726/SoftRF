@@ -4165,8 +4165,7 @@ AceButton button_1(SOC_GPIO_PIN_BUTTON);
 AceButton button_2(SOC_GPIO_PIN_PAD);
 
 // The event handler for the button.
-void handleEvent(AceButton* button, uint8_t eventType,
-    uint8_t buttonState) {
+void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
 
   switch (eventType) {
     case AceButton::kEventClicked:
