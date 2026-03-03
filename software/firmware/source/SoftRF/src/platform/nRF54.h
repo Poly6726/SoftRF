@@ -97,7 +97,7 @@ struct rst_info {
 #define SOC_GPIO_PIN_STATUS   (hw_info.model == SOFTRF_MODEL_ACADEMY ? \
                                SOC_GPIO_PIN_EVK_STATUS : SOC_UNUSED_PIN)
 
-#define EXCLUDE_EEPROM
+//#define EXCLUDE_EEPROM
 #define EXCLUDE_WIFI
 #define EXCLUDE_ETHERNET
 
