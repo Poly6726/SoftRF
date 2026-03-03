@@ -402,8 +402,12 @@ jobs:
           fi
           if [[ "$BOARD" =~ "nrf54l15clean:nrf54l15clean:" ]]; then
             arduino --pref "boardsmanager.additional.urls=https://raw.githubusercontent.com/lolren/NRF54L15-Clean-Arduino-core/main/package_nrf54l15clean_stable_index.json" --save-prefs ;
-            arduino --install-boards nrf54l15clean:nrf54l15clean:0.1.3 ;
+            # arduino --install-boards nrf54l15clean:nrf54l15clean:0.1.7 ;
+            arduino --install-boards nrf54l15clean:nrf54l15clean ;
             arduino --board $BOARD --save-prefs ;
+            # cd $HOME/.arduino15/packages/nrf54l15clean/hardware/nrf54l15clean/0.1.7 ;
+            # sed -i '15 a #include <avr/pgmspace.h>'  cores/nrf54l15/WString.h ;
+            # sed -i '16 a class __FlashStringHelper;' cores/nrf54l15/WString.h ;
             cd $GITHUB_WORKSPACE ;
           fi
           if [[ "$BOARD" =~ "arduino:mbed_edge:" ]]; then
