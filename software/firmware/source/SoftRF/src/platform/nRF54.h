@@ -140,7 +140,7 @@ struct rst_info {
 //#define USE_WEBUSB_SERIAL
 //#define USE_WEBUSB_SETTINGS
 //#define USE_USB_MIDI
-//#define USE_PWM_SOUND
+#define USE_PWM_SOUND
 //#define USE_GDL90_MSL
 //#define USE_IBEACON
 #define EXCLUDE_NUS
@@ -164,6 +164,15 @@ struct rst_info {
 /* FTD-012 data port protocol version 8 and 9 */
 #define PFLAA_EXT1_FMT  ",%d,%d,%d"
 #define PFLAA_EXT1_ARGS ,Container[i].no_track,data_source,Container[i].rssi
+
+#if defined(USE_PWM_SOUND)
+#define SOC_GPIO_PIN_BUZZER   (nRF54_board == NRF54_LR2021EVK1XCS1 ? \
+                               SOC_GPIO_PIN_EVK_BUZZER : SOC_UNUSED_PIN)
+
+#define ALARM_TONE_HZ         2480 // seems to be the best value for 27 mm piezo buzzer
+#else
+#define SOC_GPIO_PIN_BUZZER   SOC_UNUSED_PIN
+#endif /* USE_PWM_SOUND */
 
 #if defined(USE_OLED)
 #define U8X8_OLED_I2C_BUS_TYPE  U8X8_SSD1306_128X64_NONAME_HW_I2C

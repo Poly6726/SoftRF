@@ -32,7 +32,7 @@
 
 #define SOC_GPIO_PIN_EVK_STATUS         PIN_LED_BUILTIN // D16, P2.00 +
 #define SOC_GPIO_PIN_EVK_BUTTON         PIN_BUTTON     // D17, P0.00 +, XIAO
-#define SOC_GPIO_PIN_EVK_BUZZER         SOC_UNUSED_PIN
+#define SOC_GPIO_PIN_EVK_BUZZER         SOC_GPIO_PIN_EVK_D15
 #define SOC_GPIO_PIN_EVK_BATTERY        PIN_A7         // A7,  P1.14 + (AIN7)
 
 #define SOC_GPIO_PIN_EVK_D11            PIN_D11        // D11, P0.03 +
@@ -81,7 +81,7 @@
 
 #define SOC_GPIO_PIN_EVK_STATUS         _PINNUM(2,  0) // D16, P2.00 +
 #define SOC_GPIO_PIN_EVK_BUTTON         _PINNUM(0,  0) // D17, P0.00 +, XIAO
-#define SOC_GPIO_PIN_EVK_BUZZER         SOC_UNUSED_PIN
+#define SOC_GPIO_PIN_EVK_BUZZER         SOC_GPIO_PIN_EVK_D15
 #define SOC_GPIO_PIN_EVK_BATTERY        _PINNUM(1, 14) // A7,  P1.14 + (AIN7)
 #define SOC_GPIO_PIN_EVK_VBAT_EN        _PINNUM(1, 15) //      P1.15 -
 

@@ -166,7 +166,6 @@ static constexpr uintptr_t kResetBase = 0x5010E000UL;
 static constexpr uintptr_t kRegulatorsBase = 0x50120000UL;
 #endif
 
-
 static NRF_POWER_Type* const g_power =
     reinterpret_cast<NRF_POWER_Type*>(kPowerBase);
 static NRF_RESET_Type* const g_reset =
@@ -244,21 +243,18 @@ static void nRF54_setup()
       pinMode(SOC_GPIO_PIN_EVK_STATUS,     OUTPUT);
       digitalWrite(SOC_GPIO_PIN_EVK_STATUS, LED_STATE_ON);
 
+      pinMode(SOC_GPIO_PIN_EVK_BUTTON_AUX, INPUT_PULLUP);
+
       #if defined(ARDUINO_XIAO_NRF54L15)
-      // Gpio::configure(kPinVbatEnable, GpioDirection::kOutput, GpioPull::kDisabled);
-      // Gpio::write(kPinVbatEnable, true);
       BoardControl::setBatterySenseEnabled(true);
+
+      xiaoNrf54l15SetAntenna(XIAO_NRF54L15_ANTENNA_CERAMIC);
       #else
       pinMode(SOC_GPIO_PIN_EVK_VBAT_EN,    INPUT_PULLDOWN);
-      #endif /* ARDUINO_XIAO_NRF54L15 */
-      pinMode(SOC_GPIO_PIN_EVK_BUTTON_AUX, INPUT_PULLUP);
 
       pinMode(SOC_GPIO_PIN_EVK_ANT_PWR,    OUTPUT);
       digitalWrite(SOC_GPIO_PIN_EVK_ANT_PWR, HIGH);
 
-      #if defined(ARDUINO_XIAO_NRF54L15)
-      xiaoNrf54l15SetAntenna(XIAO_NRF54L15_ANTENNA_CERAMIC);
-      #else
       pinMode(SOC_GPIO_PIN_EVK_ANT_SW,     INPUT_PULLDOWN); /* ANT 1 */
       #endif /* ARDUINO_XIAO_NRF54L15 */
 
@@ -338,7 +334,7 @@ static void nRF54_fini(int reason)
 
 static void nRF54_reset()
 {
-
+  SoftReset();
 }
 
 static uint32_t nRF54_getChipId()
@@ -388,7 +384,7 @@ static String nRF54_getResetReason()
 
 static uint32_t nRF54_getFreeHeap()
 {
-  return 0; /* TBD */
+  return getFreeHeap();
 }
 
 static long nRF54_random(long howsmall, long howBig)
@@ -398,12 +394,31 @@ static long nRF54_random(long howsmall, long howBig)
 
 static void nRF54_Sound_test(int var)
 {
+#if defined(USE_PWM_SOUND)
+  if (SOC_GPIO_PIN_BUZZER != SOC_UNUSED_PIN && settings->volume != BUZZER_OFF) {
+    tone(SOC_GPIO_PIN_BUZZER, 440,  500); delay(500);
+    tone(SOC_GPIO_PIN_BUZZER, 640,  500); delay(500);
+    tone(SOC_GPIO_PIN_BUZZER, 840,  500); delay(500);
+    tone(SOC_GPIO_PIN_BUZZER, 1040, 500); delay(600);
 
+    noTone(SOC_GPIO_PIN_BUZZER);
+    pinMode(SOC_GPIO_PIN_BUZZER, INPUT);
+  }
+#endif /* USE_PWM_SOUND */
 }
 
 static void nRF54_Sound_tone(int hz, uint8_t volume)
 {
-
+#if defined(USE_PWM_SOUND)
+  if (SOC_GPIO_PIN_BUZZER != SOC_UNUSED_PIN && volume != BUZZER_OFF) {
+    if (hz > 0) {
+      tone(SOC_GPIO_PIN_BUZZER, hz, ALARM_TONE_MS);
+    } else {
+      noTone(SOC_GPIO_PIN_BUZZER);
+      pinMode(SOC_GPIO_PIN_BUZZER, INPUT);
+    }
+  }
+#endif /* USE_PWM_SOUND */
 }
 
 static void nRF54_WiFi_set_param(int ndx, int value)
