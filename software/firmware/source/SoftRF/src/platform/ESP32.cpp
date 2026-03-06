@@ -517,7 +517,15 @@ esp_err_t es8311_codec_init(const unsigned int i2c_num) {
     return ESP_OK;
 }
 
+#include <SensorLib_Version.h>
+#if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
 #include <ExtensionIOXL9555.hpp>
+#endif /* 0, 3, 1 */
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 3, 4)
+#include "IoExpanderXL9555.hpp"
+
+#define ExtensionIOXL9555 IoExpanderXL9555
+#endif /* 0, 3, 4 */
 #include <GaugeBQ27220.hpp>
 #include <ICM_20948.h>
 #include <TouchDrvGT911.hpp>
@@ -574,8 +582,8 @@ static uint32_t ESP32_getFlashId()
   return g_rom_flashchip.device_id;
 }
 
-#if defined(CORE_DEBUG_LEVEL) && CORE_DEBUG_LEVEL>0 && !defined(TAG)
-#define TAG "MAC"
+#if defined(CORE_DEBUG_LEVEL) && CORE_DEBUG_LEVEL>0 && !defined(TAG_MAC)
+#define TAG_MAC "MAC"
 #endif
 
 static void ESP32_setup()
@@ -595,17 +603,17 @@ static void ESP32_setup()
 #else
   ret = esp_efuse_mac_get_custom(efuse_mac);
   if (ret != ESP_OK) {
-      ESP_LOGE(TAG, "Get base MAC address from BLK3 of EFUSE error (%s)", esp_err_to_name(ret));
+      ESP_LOGE(TAG_MAC, "Get base MAC address from BLK3 of EFUSE error (%s)", esp_err_to_name(ret));
     /* If get custom base MAC address error, the application developer can decide what to do:
      * abort or use the default base MAC address which is stored in BLK0 of EFUSE by doing
      * nothing.
      */
 #endif /* CONFIG_IDF_TARGET_ESP32C5 || C6 || H2 || H4 */
-    ESP_LOGI(TAG, "Use base MAC address which is stored in BLK0 of EFUSE");
+    ESP_LOGI(TAG_MAC, "Use base MAC address which is stored in BLK0 of EFUSE");
     chipmacid = ESP.getEfuseMac();
   } else {
     if (memcmp(efuse_mac, null_mac, 6) == 0) {
-      ESP_LOGI(TAG, "Use base MAC address which is stored in BLK0 of EFUSE");
+      ESP_LOGI(TAG_MAC, "Use base MAC address which is stored in BLK0 of EFUSE");
       chipmacid = ESP.getEfuseMac();
     }
   }
@@ -1945,17 +1953,20 @@ static void ESP32_setup()
                                              SOC_GPIO_PIN_TDP4_SCL_1);
     if (ESP32_has_gpio_extension) {
       /* make GNSS inactive prior to 3.3V power ON */
-      xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_GNSS_WKE, LOW);
       xl9535->pinMode(ExtensionIOXL9555::SOC_EXPIO_TDP4_GNSS_WKE, OUTPUT);
+      xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_GNSS_WKE, LOW);
 
       /* make ESP32-C6 inactive prior to 3.3V power ON */
-      xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_SLAVE_EN, LOW);
       xl9535->pinMode(ExtensionIOXL9555::SOC_EXPIO_TDP4_SLAVE_EN, OUTPUT);
+      xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_SLAVE_EN, LOW);
 
       /* USB PHY power */
-      xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_VCCA_EN,  LOW);
       xl9535->pinMode(ExtensionIOXL9555::SOC_EXPIO_TDP4_VCCA_EN,  OUTPUT);
+      xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_VCCA_EN,  LOW);
 
+
+      xl9535->pinMode(ExtensionIOXL9555::SOC_EXPIO_TDP4_3V3_EN,   OUTPUT);
+      xl9535->pinMode(ExtensionIOXL9555::SOC_EXPIO_TDP4_5V0_EN,   OUTPUT);
       /*
        * Turn ON power of
        * GNSS, TFT back light, ESP32-C6,
@@ -1967,12 +1978,9 @@ static void ESP32_setup()
       /* Power of NS4150 audio amp. and ES8311 analog circuits */
       xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_5V0_EN,   HIGH);
 
-      xl9535->pinMode(ExtensionIOXL9555::SOC_EXPIO_TDP4_3V3_EN,   OUTPUT);
-      xl9535->pinMode(ExtensionIOXL9555::SOC_EXPIO_TDP4_5V0_EN,   OUTPUT);
-
       /* Power of micro-SD */
-      xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_SD_EN,    LOW);
       xl9535->pinMode(ExtensionIOXL9555::SOC_EXPIO_TDP4_SD_EN,    OUTPUT);
+      xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_SD_EN,    LOW);
     }
 
 #if SOC_SDMMC_IO_POWER_EXTERNAL
@@ -2507,10 +2515,10 @@ static void ESP32_setup()
       /* Wake up Quectel L76K GNSS */
       xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_GNSS_WKE, HIGH);
 
-      xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_DSI_RST,  HIGH);
-      xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_TP_RST,   HIGH);
       xl9535->pinMode(ExtensionIOXL9555::SOC_EXPIO_TDP4_DSI_RST,   OUTPUT);
       xl9535->pinMode(ExtensionIOXL9555::SOC_EXPIO_TDP4_TP_RST,    OUTPUT);
+      xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_DSI_RST,  HIGH);
+      xl9535->digitalWrite(ExtensionIOXL9555::SOC_EXPIO_TDP4_TP_RST,   HIGH);
 
       delay(200);
 

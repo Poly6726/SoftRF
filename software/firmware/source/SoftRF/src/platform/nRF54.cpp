@@ -245,15 +245,15 @@ static void nRF54_setup()
 
       pinMode(SOC_GPIO_PIN_EVK_BUTTON_AUX, INPUT_PULLUP);
 
+      pinMode(SOC_GPIO_PIN_EVK_ANT_PWR,    OUTPUT);
+      digitalWrite(SOC_GPIO_PIN_EVK_ANT_PWR, HIGH);
+
       #if defined(ARDUINO_XIAO_NRF54L15)
       BoardControl::setBatterySenseEnabled(true);
 
       xiaoNrf54l15SetAntenna(XIAO_NRF54L15_ANTENNA_CERAMIC);
       #else
       pinMode(SOC_GPIO_PIN_EVK_VBAT_EN,    INPUT_PULLDOWN);
-
-      pinMode(SOC_GPIO_PIN_EVK_ANT_PWR,    OUTPUT);
-      digitalWrite(SOC_GPIO_PIN_EVK_ANT_PWR, HIGH);
 
       pinMode(SOC_GPIO_PIN_EVK_ANT_SW,     INPUT_PULLDOWN); /* ANT 1 */
       #endif /* ARDUINO_XIAO_NRF54L15 */

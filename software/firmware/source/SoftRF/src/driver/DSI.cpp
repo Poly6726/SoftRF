@@ -78,6 +78,7 @@ void gesture_event_handler(lv_event_t * e)
 #endif /* USE_EDPLIB_TOUCH */
 
 #if defined(USE_SENSORLIB_TOUCH)
+#include <SensorLib_Version.h>
 #include "TouchDrvGT911.hpp"
 #include "TouchDrvGT9895.hpp"
 
@@ -112,8 +113,13 @@ bool setupTouchDrv()
       touchDrv->setPins(-1 /* XL P03 */, -1 /* XL P04 */);
       result = touchDrv->begin(TDP4_IIC_1, GT9895_SLAVE_ADDRESS_L,
                                SOC_GPIO_PIN_TDP4_SDA_1, SOC_GPIO_PIN_TDP4_SCL_1);
-      touchDrv->setMaxCoordinates(panel->getLCD()->getFrameWidth(),
-                                  panel->getLCD()->getFrameHeight());
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 3, 4)
+      touchDrv->setResolution(1060, 2400);
+      touchDrv->setTargetResolution(panel->getLCD()->getFrameWidth(),
+                                    panel->getLCD()->getFrameHeight());
+      // touchDrv->setMaxCoordinates(panel->getLCD()->getFrameWidth(),
+      //                             panel->getLCD()->getFrameHeight());
+#endif /* SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 3, 4) */
       break;
     case TOUCH_GT911:
     default:
@@ -227,6 +233,7 @@ void DSI_loop()
 
 #if defined(USE_SENSORLIB_TOUCH)
       if (touchDrv) {
+#if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
         if (touchDrv->isPressed()) {
             uint8_t touched = touchDrv->getPoint(x, y, touchDrv->getSupportTouchPoint());
 #if 0
@@ -260,6 +267,38 @@ void DSI_loop()
                 gesture.touched = true;
               }
             }
+#endif /* SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1) */
+
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 3, 4)
+        TouchPoints touch_points = touchDrv->getTouchPoints();
+        if (touch_points.hasPoints()) {
+            int i = 0;
+            const TouchPoint &point = touch_points.getPoint(i);
+#if 0
+            Serial.print("X[");
+            Serial.print(i);
+            Serial.print("]:");
+            Serial.print(point.x);
+            Serial.print(" ");
+            Serial.print(" Y[");
+            Serial.print(i);
+            Serial.print("]:");
+            Serial.print(point.y);
+            Serial.print(" ");
+#endif
+            TP_Point p;
+            p.x = point.x;
+            p.y = point.y;
+
+            if (gesture.touched) {
+//                Serial.println("touched > 0 , gesture.touched = true");
+              gesture.d_loc = p;
+            } else {
+//                Serial.println("touched > 0 , gesture.touched = flase");
+              gesture.t_loc = p; gesture.d_loc = p;
+              gesture.touched = true;
+            }
+#endif /* SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 3, 4) */
         } else {
 //            Serial.println("isPressed() = false");
             if (gesture.touched) {

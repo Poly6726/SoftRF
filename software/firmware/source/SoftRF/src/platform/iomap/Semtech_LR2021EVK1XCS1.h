@@ -27,13 +27,14 @@
 #define SOC_GPIO_PIN_EVK_SCL            PIN_D5         // D5,  P1.11 +
 
 /* antenna switch */
-#define SOC_GPIO_PIN_EVK_ANT_SW         _PINNUM(2,  5) // P2.05 +
-#define SOC_GPIO_PIN_EVK_ANT_PWR        _PINNUM(2,  3) // P2.03 +
+#define SOC_GPIO_PIN_EVK_ANT_SW         PIN_RF_SW_CTL  //      P2.05 +
+#define SOC_GPIO_PIN_EVK_ANT_PWR        PIN_RF_SW      //      P2.03 +
 
 #define SOC_GPIO_PIN_EVK_STATUS         PIN_LED_BUILTIN // D16, P2.00 +
 #define SOC_GPIO_PIN_EVK_BUTTON         PIN_BUTTON     // D17, P0.00 +, XIAO
 #define SOC_GPIO_PIN_EVK_BUZZER         SOC_GPIO_PIN_EVK_D15
 #define SOC_GPIO_PIN_EVK_BATTERY        PIN_A7         // A7,  P1.14 + (AIN7)
+#define SOC_GPIO_PIN_EVK_VBAT_EN        PIN_VBAT_EN    //      P1.15 -
 
 #define SOC_GPIO_PIN_EVK_D11            PIN_D11        // D11, P0.03 +
 #define SOC_GPIO_PIN_EVK_D12            PIN_D12        // D12, P0.04 +
