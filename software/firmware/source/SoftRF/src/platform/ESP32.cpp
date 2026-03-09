@@ -2966,6 +2966,17 @@ static void ESP32_post_init()
     break;
 #endif /* USE_EPAPER */
 
+#if defined(USE_DSI)
+  case DISPLAY_TFT_WIRELESSTAG_7:
+  case DISPLAY_TFT_LILYGO_4_05:
+  case DISPLAY_AMOLED_LILYGO_4_1:
+    if (hw_info.model == SOFTRF_MODEL_CONCORDE) {
+      DSI_info1();
+    }
+
+    break;
+#endif /* USE_DSI */
+
   case DISPLAY_NONE:
   default:
     break;

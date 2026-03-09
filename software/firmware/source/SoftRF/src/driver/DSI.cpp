@@ -34,13 +34,13 @@ using namespace esp_panel::board;
 
 Board *panel = NULL;
 
-const char DSI_SkyView_text1 [] = SOFTRF_IDENT;
-const char DSI_SkyView_text2 [] = "Author:  Linar Yusupov  (C) 2016-2026";
-const char DSI_SkyView_text3 [] = "POWER";
-const char DSI_SkyView_text4 [] = "OFF";
-const char DSI_SkyView_text5 [] = "Screen";
-const char DSI_SkyView_text6 [] = "Saver";
-const char DSI_SkyView_text7 [] = "VERSION " SOFTRF_FIRMWARE_VERSION;
+const char DSI_SoftRF_text1 [] = SOFTRF_IDENT;
+const char DSI_SoftRF_text2 [] = "Author:  Linar Yusupov  (C) 2016-2026";
+const char DSI_SoftRF_text3 [] = "POWER";
+const char DSI_SoftRF_text4 [] = "OFF";
+const char DSI_SoftRF_text5 [] = "Screen";
+const char DSI_SoftRF_text6 [] = "Saver";
+const char DSI_SoftRF_text7 [] = "VERSION " SOFTRF_FIRMWARE_VERSION;
 
 static unsigned long DSI_TimeMarker = 0;
 static unsigned long TP_TimeMarker  = 0;
@@ -189,17 +189,17 @@ void DSI_setup()
     lv_obj_set_style_text_color(lv_scr_act(), lv_color_white(), LV_PART_MAIN);
 
     lv_obj_t *label_1 = lv_label_create(lv_scr_act());
-    lv_label_set_text(label_1, DSI_SkyView_text1);
+    lv_label_set_text(label_1, DSI_SoftRF_text1);
     lv_obj_set_style_text_font(label_1, &lv_font_montserrat_48, 0);
     lv_obj_align(label_1, LV_ALIGN_CENTER, 0, -60);
 
     lv_obj_t *label_2 = lv_label_create(lv_scr_act());
-    lv_label_set_text(label_2, DSI_SkyView_text7);
+    lv_label_set_text(label_2, DSI_SoftRF_text7);
     lv_obj_set_style_text_font(label_2, &lv_font_montserrat_24, 0);
     lv_obj_align_to(label_2, label_1, LV_ALIGN_OUT_BOTTOM_MID, 0, 40);
 
     lv_obj_t *label_3 = lv_label_create(lv_scr_act());
-    lv_label_set_text(label_3, DSI_SkyView_text2);
+    lv_label_set_text(label_3, DSI_SoftRF_text2);
     lv_obj_set_style_text_font(label_3, &lv_font_montserrat_24, 0);
     lv_obj_align_to(label_3, label_2, LV_ALIGN_OUT_BOTTOM_MID, 0, 20);
 
@@ -269,10 +269,8 @@ void DSI_loop()
               p.y = y[0];
 
               if (gesture.touched) {
-//                Serial.println("touched > 0 , gesture.touched = true");
                 gesture.d_loc = p;
               } else {
-//                Serial.println("touched > 0 , gesture.touched = flase");
                 gesture.t_loc = p; gesture.d_loc = p;
                 gesture.touched = true;
               }
@@ -294,25 +292,21 @@ void DSI_loop()
             Serial.print(i);
             Serial.print("]:");
             Serial.print(point.y);
-            Serial.print(" ");
+            Serial.println();
 #endif
             TP_Point p;
             p.x = point.x;
             p.y = point.y;
 
             if (gesture.touched) {
-//                Serial.println("touched > 0 , gesture.touched = true");
               gesture.d_loc = p;
             } else {
-//                Serial.println("touched > 0 , gesture.touched = flase");
               gesture.t_loc = p; gesture.d_loc = p;
               gesture.touched = true;
             }
 #endif /* (0, 4, 0) */
         } else {
-//            Serial.println("isPressed() = false");
             if (gesture.touched) {
-//              Serial.println("isPressed() = false , gesture.touched = true");
               int16_t FrameWidth  = panel->getLCD()->getFrameWidth();
               int16_t FrameHeight = panel->getLCD()->getFrameHeight();
               int16_t threshold_x = FrameWidth  / 10;
@@ -388,7 +382,7 @@ void DSI_fini()
     lv_obj_clean(lv_scr_act());
 
     lv_obj_t *label_1 = lv_label_create(lv_scr_act());
-    lv_label_set_text(label_1, DSI_SkyView_text4);
+    lv_label_set_text(label_1, DSI_SoftRF_text4);
     lv_obj_set_style_text_font(label_1, &lv_font_montserrat_48, 0);
     lv_obj_align(label_1, LV_ALIGN_CENTER, 0, -60);
 
@@ -469,6 +463,168 @@ void DSI_Next_Page()
     default:
       DSI_view_mode = VIEW_MODE_RADAR;
       DSI_vmode_updated = true;
+      break;
+    }
+  }
+}
+
+void DSI_info1()
+{
+  if (panel) {
+    switch (hw_info.display)
+    {
+    case DISPLAY_TFT_WIRELESSTAG_7:
+    case DISPLAY_TFT_LILYGO_4_05:
+    case DISPLAY_AMOLED_LILYGO_4_1:
+      lvgl_port_lock(-1);
+
+#if LVGL_VERSION_MAJOR == 8
+      lv_obj_clean(lv_scr_act());
+
+      lv_obj_t *label_1 = lv_label_create(lv_scr_act());
+      lv_label_set_text(label_1, "          Self Test");
+      lv_obj_set_style_text_font(label_1, &lv_font_montserrat_48, 0);
+      lv_obj_align(label_1, LV_ALIGN_OUT_TOP_LEFT, 40, 20);
+
+      lv_obj_t *data_1 = lv_label_create(lv_scr_act());
+      lv_label_set_text(data_1, " ");
+      lv_obj_set_style_text_font(data_1, &lv_font_montserrat_48, 0);
+      lv_obj_align(data_1, LV_ALIGN_TOP_RIGHT, -40, 20);
+
+      lv_obj_t *label_2 = lv_label_create(lv_scr_act());
+      lv_label_set_text(label_2, "RADIO");
+      lv_obj_set_style_text_font(label_2, &lv_font_montserrat_48, 0);
+      lv_obj_align_to(label_2, label_1, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+
+      lv_obj_t *data_2 = lv_label_create(lv_scr_act());
+      lv_label_set_text_fmt(data_2, "%s", hw_info.rf != RF_IC_NONE ?
+                            "PASS" : "FAIL");
+      lv_obj_set_style_text_font(data_2, &lv_font_montserrat_48, 0);
+      lv_obj_set_style_text_color(data_2, hw_info.rf != RF_IC_NONE ?
+                                  lv_palette_main(LV_PALETTE_GREEN) :
+                                  lv_palette_main(LV_PALETTE_RED), 0);
+      lv_obj_align_to(data_2, data_1, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+
+      lv_obj_t *label_3 = lv_label_create(lv_scr_act());
+      lv_label_set_text(label_3, "GNSS");
+      lv_obj_set_style_text_font(label_3, &lv_font_montserrat_48, 0);
+      lv_obj_align_to(label_3, label_2, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+
+      lv_obj_t *data_3 = lv_label_create(lv_scr_act());
+      lv_label_set_text_fmt(data_3, "%s", hw_info.gnss != GNSS_MODULE_NONE ?
+                            "PASS" : "FAIL");
+      lv_obj_set_style_text_font(data_3, &lv_font_montserrat_48, 0);
+      lv_obj_set_style_text_color(data_3, hw_info.gnss != GNSS_MODULE_NONE ?
+                                  lv_palette_main(LV_PALETTE_GREEN) :
+                                  lv_palette_main(LV_PALETTE_RED), 0);
+      lv_obj_align_to(data_3, data_2, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+
+      lv_obj_t *label_4 = lv_label_create(lv_scr_act());
+      lv_label_set_text(label_4, "RTC");
+      lv_obj_set_style_text_font(label_4, &lv_font_montserrat_48, 0);
+      lv_obj_align_to(label_4, label_3, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+
+      lv_obj_t *data_4 = lv_label_create(lv_scr_act());
+      lv_label_set_text_fmt(data_4, "%s", hw_info.rtc == RTC_PCF8563 ?
+                            "PASS" : "FAIL");
+      lv_obj_set_style_text_font(data_4, &lv_font_montserrat_48, 0);
+      lv_obj_set_style_text_color(data_4, hw_info.rtc == RTC_PCF8563 ?
+                                  lv_palette_main(LV_PALETTE_GREEN) :
+                                  lv_palette_main(LV_PALETTE_RED), 0);
+      lv_obj_align_to(data_4, data_3, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+
+      lv_obj_t *label_5 = lv_label_create(lv_scr_act());
+      lv_label_set_text(label_5, "IMU");
+      lv_obj_set_style_text_font(label_5, &lv_font_montserrat_48, 0);
+      lv_obj_align_to(label_5, label_4, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+
+      lv_obj_t *data_5 = lv_label_create(lv_scr_act());
+      lv_label_set_text_fmt(data_5, "%s", hw_info.imu != IMU_NONE ?
+                            "PASS" : "FAIL");
+      lv_obj_set_style_text_font(data_5, &lv_font_montserrat_48, 0);
+      lv_obj_set_style_text_color(data_5, hw_info.imu != IMU_NONE ?
+                                  lv_palette_main(LV_PALETTE_GREEN) :
+                                  lv_palette_main(LV_PALETTE_RED), 0);
+      lv_obj_align_to(data_5, data_4, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+
+      lv_obj_t *label_6 = lv_label_create(lv_scr_act());
+      lv_label_set_text(label_6, "AUDIO");
+      lv_obj_set_style_text_font(label_6, &lv_font_montserrat_48, 0);
+      lv_obj_align_to(label_6, label_5, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+
+      lv_obj_t *data_6 = lv_label_create(lv_scr_act());
+      lv_label_set_text_fmt(data_6, "%s", hw_info.audio == AUDIO_ES8311 ?
+                            "PASS" : "FAIL");
+      lv_obj_set_style_text_font(data_6, &lv_font_montserrat_48, 0);
+      lv_obj_set_style_text_color(data_6, hw_info.audio == AUDIO_ES8311 ?
+                                  lv_palette_main(LV_PALETTE_GREEN) :
+                                  lv_palette_main(LV_PALETTE_RED), 0);
+      lv_obj_align_to(data_6, data_5, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+
+      lv_obj_t *label_7 = lv_label_create(lv_scr_act());
+      lv_label_set_text(label_7, "TOUCH");
+      lv_obj_set_style_text_font(label_7, &lv_font_montserrat_48, 0);
+      lv_obj_align_to(label_7, label_6, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+
+      lv_obj_t *data_7 = lv_label_create(lv_scr_act());
+      lv_label_set_text_fmt(data_7, "%s", hw_info.touch != TOUCH_NONE ?
+                            "PASS" : "FAIL");
+      lv_obj_set_style_text_font(data_7, &lv_font_montserrat_48, 0);
+      lv_obj_set_style_text_color(data_7, hw_info.touch != TOUCH_NONE ?
+                                  lv_palette_main(LV_PALETTE_GREEN) :
+                                  lv_palette_main(LV_PALETTE_RED), 0);
+      lv_obj_align_to(data_7, data_6, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+
+      lv_obj_t *label_8 = lv_label_create(lv_scr_act());
+      lv_label_set_text(label_8, "HAPTIC");
+      lv_obj_set_style_text_font(label_8, &lv_font_montserrat_48, 0);
+      lv_obj_align_to(label_8, label_7, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+
+      lv_obj_t *data_8 = lv_label_create(lv_scr_act());
+      lv_label_set_text_fmt(data_8, "%s", hw_info.haptic == HAPTIC_AW86224 ?
+                            "PASS" : "FAIL");
+      lv_obj_set_style_text_font(data_8, &lv_font_montserrat_48, 0);
+      lv_obj_set_style_text_color(data_8, hw_info.haptic == HAPTIC_AW86224 ?
+                                  lv_palette_main(LV_PALETTE_GREEN) :
+                                  lv_palette_main(LV_PALETTE_RED), 0);
+      lv_obj_align_to(data_8, data_7, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+
+      lv_obj_t *label_9 = lv_label_create(lv_scr_act());
+      lv_label_set_text(label_9, "CARD");
+      lv_obj_set_style_text_font(label_9, &lv_font_montserrat_48, 0);
+      lv_obj_align_to(label_9, label_8, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+
+      lv_obj_t *data_9 = lv_label_create(lv_scr_act());
+      lv_label_set_text_fmt(data_9, "%s", hw_info.storage == STORAGE_CARD ?
+                            "PASS" : "N/A");
+      lv_obj_set_style_text_font(data_9, &lv_font_montserrat_48, 0);
+      lv_obj_set_style_text_color(data_9, hw_info.storage == STORAGE_CARD ?
+                                  lv_palette_main(LV_PALETTE_GREEN) :
+                                  lv_palette_main(LV_PALETTE_YELLOW), 0);
+      lv_obj_align_to(data_9, data_8, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+
+      lv_obj_t *label_10 = lv_label_create(lv_scr_act());
+      lv_label_set_text(label_10, "BARO");
+      lv_obj_set_style_text_font(label_10, &lv_font_montserrat_48, 0);
+      lv_obj_align_to(label_10, label_9, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+
+      lv_obj_t *data_10 = lv_label_create(lv_scr_act());
+      lv_label_set_text_fmt(data_10, "%s", hw_info.baro != BARO_MODULE_NONE ?
+                            "PASS" : "N/A");
+      lv_obj_set_style_text_font(data_10, &lv_font_montserrat_48, 0);
+      lv_obj_set_style_text_color(data_10, hw_info.baro != BARO_MODULE_NONE ?
+                                  lv_palette_main(LV_PALETTE_GREEN) :
+                                  lv_palette_main(LV_PALETTE_YELLOW), 0);
+      lv_obj_align_to(data_10, data_9, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+#endif /* LVGL_VERSION_MAJOR == 8 */
+
+      lvgl_port_unlock();
+
+      delay(3000);
+
+      break;
+    case DISPLAY_NONE:
+    default:
       break;
     }
   }
