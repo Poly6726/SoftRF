@@ -47,6 +47,7 @@ void DSI_Down();
 void DSI_Next_Page();
 
 void DSI_info1();
+void DSI_info2(int, char *, char *, char *);
 
 void DSI_status_setup();
 void DSI_status_loop();

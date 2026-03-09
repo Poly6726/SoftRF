@@ -622,11 +622,78 @@ void DSI_info1()
                                   lv_palette_main(LV_PALETTE_YELLOW), 0);
       lv_obj_align_to(data_10, data_9, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
       }
+
+
+      delay(4000);
+
+      break;
+    case DISPLAY_NONE:
+    default:
+      break;
+    }
+  }
+}
+
+void DSI_info2(int acfts, char *reg, char *mam, char *cn)
+{
+  if (panel) {
+    switch (hw_info.display)
+    {
+    case DISPLAY_TFT_WIRELESSTAG_7:
+    case DISPLAY_TFT_LILYGO_4_05:
+    case DISPLAY_AMOLED_LILYGO_4_1:
+      lvgl_port_lock(-1);
+
+#if LVGL_VERSION_MAJOR == 8
+      lv_obj_clean(lv_scr_act());
+
+      if (acfts == -1) {
+        lv_obj_t *label_1 = lv_label_create(lv_scr_act());
+        lv_label_set_text(label_1, "WARNING");
+        lv_obj_set_style_text_font(label_1, &lv_font_montserrat_48, 0);
+        lv_obj_set_style_text_color(label_1, lv_palette_main(LV_PALETTE_YELLOW), 0);
+        lv_obj_align(label_1, LV_ALIGN_CENTER, 0, -60);
+
+        lv_obj_t *label_2 = lv_label_create(lv_scr_act());
+        lv_label_set_text(label_2, "NO AIRCRAFTS");
+        lv_obj_set_style_text_font(label_2, &lv_font_montserrat_48, 0);
+        lv_obj_align_to(label_2, label_1, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+
+        lv_obj_t *label_3 = lv_label_create(lv_scr_act());
+        lv_label_set_text(label_3, "DATA");
+        lv_obj_set_style_text_font(label_3, &lv_font_montserrat_48, 0);
+        lv_obj_align_to(label_3, label_2, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+      } else {
+        lv_obj_t *label_1 = lv_label_create(lv_scr_act());
+        lv_label_set_text_fmt(label_1, "%d ACFTS LOADED", acfts);
+        lv_obj_set_style_text_font(label_1, &lv_font_montserrat_48, 0);
+        lv_obj_align(label_1, LV_ALIGN_CENTER, 0, -100);
+
+        lv_obj_t *label_2 = lv_label_create(lv_scr_act());
+        lv_label_set_text(label_2, "THIS AIRCRAFT");
+        lv_obj_set_style_text_font(label_2, &lv_font_montserrat_48, 0);
+        lv_obj_align_to(label_2, label_1, LV_ALIGN_OUT_BOTTOM_MID, 0, 100);
+
+        lv_obj_t *label_3 = lv_label_create(lv_scr_act());
+        lv_label_set_text(label_3, reg);
+        lv_obj_set_style_text_font(label_3, &lv_font_montserrat_48, 0);
+        lv_obj_align_to(label_3, label_2, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+
+        lv_obj_t *label_4 = lv_label_create(lv_scr_act());
+        lv_label_set_text(label_4, mam);
+        lv_obj_set_style_text_font(label_4, &lv_font_montserrat_48, 0);
+        lv_obj_align_to(label_4, label_3, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+
+        lv_obj_t *label_5 = lv_label_create(lv_scr_act());
+        lv_label_set_text_fmt(label_5, "CN: %s", cn);
+        lv_obj_set_style_text_font(label_5, &lv_font_montserrat_48, 0);
+        lv_obj_align_to(label_5, label_4, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+      }
 #endif /* LVGL_VERSION_MAJOR == 8 */
 
       lvgl_port_unlock();
 
-      delay(4000);
+      delay(3000);
 
       break;
     case DISPLAY_NONE:

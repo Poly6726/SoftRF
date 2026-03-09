@@ -86,7 +86,8 @@ void EEPROM_defaults()
                                               SOFTRF_MODE_UAV : SOFTRF_MODE_NORMAL;
   eeprom_block.field.settings.rf_protocol   = hw_info.model == SOFTRF_MODEL_BRACELET ||
                                               hw_info.model == SOFTRF_MODEL_CARD     ||
-                                              hw_info.model == SOFTRF_MODEL_POCKET ?
+                                              hw_info.model == SOFTRF_MODEL_POCKET   ||
+                                              hw_info.model == SOFTRF_MODEL_RUGGED ?
                                               RF_PROTOCOL_FANET :
                                               hw_info.model == SOFTRF_MODEL_ES ?
                                               RF_PROTOCOL_ADSB_1090 :
@@ -159,6 +160,7 @@ void EEPROM_defaults()
                                            hw_info.model == SOFTRF_MODEL_HANDHELD ||
                                            hw_info.model == SOFTRF_MODEL_SOLARIS  ||
                                            hw_info.model == SOFTRF_MODEL_POCKET   ||
+                                           hw_info.model == SOFTRF_MODEL_RUGGED   ||
                                            hw_info.model == SOFTRF_MODEL_DECENT   ?
                                            NMEA_BLUETOOTH :
                                            hw_info.model == SOFTRF_MODEL_ES        ?

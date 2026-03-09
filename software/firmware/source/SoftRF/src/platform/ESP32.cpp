@@ -2093,6 +2093,13 @@ static void ESP32_setup()
   if (uSD_is_attached && uSD.card()->cardSize() > 0) {
     hw_info.storage = (hw_info.storage == STORAGE_FLASH) ?
                       STORAGE_FLASH_AND_CARD : STORAGE_CARD;
+
+    if (esp32_board == ESP32_LILYGO_TDISPLAY_P4 &&
+        hw_info.storage == STORAGE_CARD) {
+      if (playback_inited || uSD.volumeBegin()) {
+        FATFS_is_mounted = fatfs.begin(uSD.card());
+      }
+    }
   }
 #endif /* CONFIG_IDF_TARGET_ESP32S3-P4 */
 
@@ -2975,6 +2982,58 @@ static void ESP32_post_init()
   case DISPLAY_AMOLED_LILYGO_4_1:
     if (hw_info.model == SOFTRF_MODEL_CONCORDE) {
       DSI_info1();
+
+      char key[8];
+      char out[64];
+      uint8_t tokens[3] = { 0 };
+      cdbResult rt;
+      int c, i = 0, token_cnt = 0;
+
+      int acfts;
+      char *reg, *mam, *cn;
+      reg = mam = cn = NULL;
+
+      if (ADB_is_open) {
+        acfts = ucdb.recordsNumber();
+
+        snprintf(key, sizeof(key),"%06X", ThisAircraft.addr);
+
+        rt = ucdb.findKey(key, strlen(key));
+
+        switch (rt) {
+          case KEY_FOUND:
+            while ((c = ucdb.readValue()) != -1 && i < (sizeof(out) - 1)) {
+              if (c == '|') {
+                if (token_cnt < (sizeof(tokens) - 1)) {
+                  token_cnt++;
+                  tokens[token_cnt] = i+1;
+                }
+                c = 0;
+              }
+              out[i++] = (char) c;
+            }
+            out[i] = 0;
+
+            reg = out + tokens[1];
+            mam = out + tokens[0];
+            cn  = out + tokens[2];
+
+            break;
+
+          case KEY_NOT_FOUND:
+          default:
+            break;
+        }
+
+        reg = (reg != NULL) && strlen(reg) ? reg : (char *) "REG: N/A";
+        mam = (mam != NULL) && strlen(mam) ? mam : (char *) "M&M: N/A";
+        cn  = (cn  != NULL) && strlen(cn)  ? cn  : (char *) "N/A";
+
+      } else {
+        acfts = -1;
+      }
+
+      DSI_info2(acfts, reg, mam, cn);
     }
 
     break;
@@ -5432,6 +5491,8 @@ static byte ESP32_Display_setup()
     assert(panel->begin());
 
     DSI_setup();
+
+    SoC->ADB_ops && SoC->ADB_ops->setup();
 #endif /* USE_DSI */
   } else {
 
@@ -6001,6 +6062,9 @@ static void ESP32_Display_fini(int reason)
   case DISPLAY_TFT_WIRELESSTAG_7:
   case DISPLAY_TFT_LILYGO_4_05:
   case DISPLAY_AMOLED_LILYGO_4_1:
+
+    SoC->ADB_ops && SoC->ADB_ops->fini();
+
     DSI_fini(reason);
     break;
 #endif /* USE_DSI */
