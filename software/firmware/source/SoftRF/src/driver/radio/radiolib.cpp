@@ -4775,6 +4775,15 @@ static void sx1280_shutdown()
 
 #include <fec.h>
 
+/*
+ * DF17 Rx optimization method:
+ *
+ * 0 - without optimization
+ * 1 - DF17 sync word
+ * 2 - DF17 OOK detection word
+ */
+#define OPT_DF17 1
+
 static bool lr2021_probe(void);
 static void lr20xx_setup(void);
 static void lr20xx_channel(int8_t);
@@ -5188,6 +5197,7 @@ static void lr20xx_setup()
                         rl_protocol->payload_size   +
                         rl_protocol->crc_size;
 
+#if OPT_DF17 == 0
       switch (rl_protocol->whitening)
       {
       case RF_WHITENING_MANCHESTER:
@@ -5202,17 +5212,44 @@ static void lr20xx_setup()
         rl_state = radio_g4->setEncoding(RADIOLIB_ENCODING_NRZ);
         break;
       }
+#endif /* OPT_DF17 == 0 */
+
+#if OPT_DF17 == 1 || OPT_DF17 == 2
+      pkt_size += pkt_size;
+      pkt_size -= 1;
+
+      rl_state = radio_g4->setEncoding(RADIOLIB_ENCODING_NRZ);
+#endif /* OPT_DF17 == 1 | 2 */
 
       /* whitening is driven by software */
 //      rl_state = radio_g4->setWhitening(false);
       rl_state = radio_g4->fixedPacketLengthMode(pkt_size);
     }
 
+#if OPT_DF17 == 0
     rl_state = radio_g4->setSyncWord((uint8_t *) rl_protocol->syncword,
                                      (size_t)    rl_protocol->syncword_size);
     rl_state = radio_g4->ookDetector(0x0285, 16, 0, false, false, 0);
-    rl_state = radio_g4->setOokDetectionThreshold(-80); /* TODO */
     rl_state = radio_g4->setGain(13);
+#endif /* OPT_DF17 == 0 */
+
+#if OPT_DF17 == 1
+    {
+      uint8_t df17_sync_word[1] = { 0x95 };
+      rl_state = radio_g4->setSyncWord(df17_sync_word, sizeof(df17_sync_word));
+      rl_state = radio_g4->ookDetector(0x0285, 16, 0, false, false, 0);
+      rl_state = radio_g4->setGain(0);
+    }
+#endif /* OPT_DF17 == 1 */
+
+#if OPT_DF17 == 2
+    rl_state = radio_g4->setSyncWord((uint8_t *) rl_protocol->syncword,
+                                     (size_t)    rl_protocol->syncword_size);
+    rl_state = radio_g4->ookDetector(0xa902, 16, 0, false, false, 0);
+    rl_state = radio_g4->setGain(0);
+#endif /* OPT_DF17 == 2 */
+
+    rl_state = radio_g4->setOokDetectionThreshold(-80); /* TODO */
     break;
 
   case RF_MODULATION_TYPE_2FSK:
@@ -5553,12 +5590,39 @@ static bool lr20xx_receive()
           break;
 
         case RF_PROTOCOL_ADSB_1090:
+        {
           struct mode_s_msg mm;
+
+#if OPT_DF17 == 0
           mode_s_decode(&rl_mode_s_state, &mm, RL_rxPacket_ptr->payload);
+#endif /* OPT_DF17 == 0 */
+
+#if OPT_DF17 == 1 || OPT_DF17 == 2
+          uint8_t raw[28] = { 0 };
+          uint8_t buf[14] = { 0 };
+
+          raw[0] = 0x95;
+          memcpy(raw + 1, RL_rxPacket_ptr->payload, 27);
+
+          uint8_t val1, val2;
+          for (int i = 0; i < sizeof(raw); i++) {
+            val1 = pgm_read_byte(&ManchesterDecode[raw[i]]);
+            i++;
+            val2 = pgm_read_byte(&ManchesterDecode[raw[i]]);
+            if ((i>>1) < sizeof(buf)) {
+              buf[i>>1] = ((~val1 & 0x0F) << 4) | (~val2 & 0x0F);
+            }
+          }
+
+          mode_s_decode(&rl_mode_s_state, &mm, buf);
+#endif /* OPT_DF17 == 1 | 2 */
 
           if (rl_mode_s_state.check_crc == 0 || mm.crcok) {
-
-//            Serial.printf("%02d %03d %02x%02x%02x\r\n", mm.msgtype, mm.msgbits, mm.aa1, mm.aa2, mm.aa3);
+#if 0
+            Serial.printf("%02d %03d %02x%02x%02x RSSI=%d\r\n",
+                          mm.msgtype, mm.msgbits, mm.aa1, mm.aa2, mm.aa3,
+                          (int) radio_g4->getRSSI(true));
+#endif
 
             size = mm.msgbits >> 3;
 
@@ -5567,7 +5631,12 @@ static bool lr20xx_receive()
             }
 
             if (size > 0) {
+#if OPT_DF17 == 0
               memcpy(RxBuffer, RL_rxPacket_ptr->payload, size);
+#endif /* OPT_DF17 == 0 */
+#if OPT_DF17 == 1 || OPT_DF17 == 2
+              memcpy(RxBuffer, buf, size);
+#endif /* OPT_DF17 == 1 | 2 */
 
               success = true;
             }
@@ -5585,7 +5654,7 @@ static bool lr20xx_receive()
             }
           }
           break;
-
+        }
         case RF_PROTOCOL_ADSB_UAT:
           int rs_errors;
           int frame_type;

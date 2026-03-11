@@ -499,7 +499,7 @@ void DSI_info1()
       lv_obj_t *label_2 = lv_label_create(lv_scr_act());
       lv_label_set_text(label_2, "RADIO");
       lv_obj_set_style_text_font(label_2, &lv_font_montserrat_48, 0);
-      lv_obj_align_to(label_2, label_1, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+      lv_obj_align_to(label_2, label_1, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 40);
 
       lv_obj_t *data_2 = lv_label_create(lv_scr_act());
       lv_label_set_text_fmt(data_2, "%s", hw_info.rf != RF_IC_NONE ?
@@ -508,7 +508,7 @@ void DSI_info1()
       lv_obj_set_style_text_color(data_2, hw_info.rf != RF_IC_NONE ?
                                   lv_palette_main(LV_PALETTE_GREEN) :
                                   lv_palette_main(LV_PALETTE_RED), 0);
-      lv_obj_align_to(data_2, data_1, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+      lv_obj_align_to(data_2, data_1, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 40);
 
       lv_obj_t *label_3 = lv_label_create(lv_scr_act());
       lv_label_set_text(label_3, "GNSS");
@@ -622,7 +622,9 @@ void DSI_info1()
                                   lv_palette_main(LV_PALETTE_YELLOW), 0);
       lv_obj_align_to(data_10, data_9, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
       }
+#endif /* LVGL_VERSION_MAJOR == 8 */
 
+      lvgl_port_unlock();
 
       delay(4000);
 
@@ -657,7 +659,7 @@ void DSI_info2(int acfts, char *reg, char *mam, char *cn)
         lv_obj_t *label_2 = lv_label_create(lv_scr_act());
         lv_label_set_text(label_2, "NO AIRCRAFTS");
         lv_obj_set_style_text_font(label_2, &lv_font_montserrat_48, 0);
-        lv_obj_align_to(label_2, label_1, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+        lv_obj_align_to(label_2, label_1, LV_ALIGN_OUT_BOTTOM_MID, 0, 60);
 
         lv_obj_t *label_3 = lv_label_create(lv_scr_act());
         lv_label_set_text(label_3, "DATA");
