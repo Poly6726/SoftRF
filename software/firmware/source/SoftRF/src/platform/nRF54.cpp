@@ -231,6 +231,26 @@ static void nRF54_setup()
 
   switch (nRF54_board)
   {
+    case NRF54_MX25LE02:
+      Wire.setPins(SOC_GPIO_PIN_MX25_SDA, SOC_GPIO_PIN_MX25_SCL);
+
+      lmic_pins.nss  = SOC_GPIO_PIN_MX25_SS;
+      lmic_pins.rst  = SOC_GPIO_PIN_MX25_RST;
+      lmic_pins.busy = SOC_GPIO_PIN_MX25_BUSY;
+#if defined(USE_RADIOLIB)
+      lmic_pins.dio[0] = SOC_GPIO_PIN_MX25_DIO1;
+#endif /* USE_RADIOLIB */
+
+      pinMode(SOC_GPIO_PIN_MX25_STATUS,       OUTPUT);
+      digitalWrite(SOC_GPIO_PIN_MX25_STATUS,  LED_STATE_ON);
+
+      pinMode(SOC_GPIO_PIN_MX25_BUTTON,       INPUT_PULLUP);
+
+      pinMode(SOC_GPIO_PIN_MX25_ANT_SW2,      OUTPUT);
+      digitalWrite(SOC_GPIO_PIN_MX25_ANT_SW2, HIGH);
+
+      break;
+
     case NRF54_LR2021EVK1XCS1:
     default:
       Wire.setPins(SOC_GPIO_PIN_EVK_SDA, SOC_GPIO_PIN_EVK_SCL);
@@ -455,6 +475,10 @@ static void nRF54_SPI_begin()
 {
   switch (nRF54_board)
   {
+    case NRF54_MX25LE02:
+      SPI.begin(SOC_GPIO_PIN_MX25_SS);
+      break;
+
     case NRF54_LR2021EVK1XCS1:
     default:
       SPI.begin(SOC_GPIO_PIN_EVK_SS);
@@ -476,7 +500,7 @@ static byte nRF54_Display_setup()
 {
   byte rval = DISPLAY_NONE;
 
-  if (nRF54_board == NRF54_LR2021EVK1XCS1) {
+  if (nRF54_board == NRF54_LR2021EVK1XCS1 || nRF54_board == NRF54_MX25LE02) {
 #if defined(USE_OLED)
     rval = OLED_setup();
 #endif /* USE_OLED */
@@ -590,6 +614,7 @@ static float nRF54_Battery_param(uint8_t param)
 
     switch (nRF54_board)
     {
+      case NRF54_MX25LE02:
       case NRF54_LR2021EVK1XCS1:
       default:
         bat_adc_pin = SOC_GPIO_PIN_EVK_BATTERY;
@@ -699,6 +724,9 @@ static void nRF54_Button_setup()
 
   switch (nRF54_board)
   {
+    case NRF54_MX25LE02:
+      mode_button_pin = SOC_GPIO_PIN_MX25_BUTTON;
+      break;
     case NRF54_LR2021EVK1XCS1:
     default:
       mode_button_pin = SOC_GPIO_PIN_EVK_BUTTON;

@@ -70,7 +70,8 @@ enum rst_reason {
 };
 
 enum nRF54_board_id {
-  NRF54_LR2021EVK1XCS1,
+  NRF54_LR2021EVK1XCS1, /* Seeed + Semtech */
+  NRF54_MX25LE02,       /* Minewsemi       */
 };
 
 struct rst_info {
@@ -90,6 +91,7 @@ struct rst_info {
 #endif
 
 #include "iomap/Semtech_LR2021EVK1XCS1.h"
+#include "iomap/Minewsemi_MX25LE02.h"
 
 #define SOC_GPIO_PIN_GNSS_PPS (hw_info.model == SOFTRF_MODEL_ACADEMY  ? \
                                SOC_GPIO_PIN_GNSS_EVK_PPS : SOC_UNUSED_PIN)
