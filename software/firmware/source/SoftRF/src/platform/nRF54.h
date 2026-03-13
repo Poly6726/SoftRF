@@ -90,6 +90,8 @@ struct rst_info {
 #define _PINNUM(port, pin)    ((port)*32 + (pin))
 #endif
 
+#define ARDUINO_CORE_VERSION  ARDUINO_NRF54L15_CLEAN_VERSION_STRING
+
 #include "iomap/Semtech_LR2021EVK1XCS1.h"
 #include "iomap/Minewsemi_MX25LE02.h"
 
@@ -127,7 +129,7 @@ struct rst_info {
 #define EXCLUDE_BME280AUX        //  -    kb
 #define EXCLUDE_MPL3115A2        //  -    kb
 #define EXCLUDE_NRF905           //  -    kb
-#define EXCLUDE_MAVLINK          //  -    kb
+//#define EXCLUDE_MAVLINK        //  -    kb
 #define EXCLUDE_UATM             //  -    kb
 #define EXCLUDE_EGM96            //  - 16 kb
 #define EXCLUDE_LED_RING         //  -    kb
