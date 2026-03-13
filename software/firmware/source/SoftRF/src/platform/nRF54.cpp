@@ -232,6 +232,7 @@ static void nRF54_setup()
   switch (nRF54_board)
   {
     case NRF54_MX25LE02:
+      Serial.setPins(SOC_GPIO_PIN_CONS_MX25_RX, SOC_GPIO_PIN_CONS_MX25_TX);
       Wire.setPins(SOC_GPIO_PIN_MX25_SDA, SOC_GPIO_PIN_MX25_SCL);
 
       lmic_pins.nss  = SOC_GPIO_PIN_MX25_SS;
@@ -253,6 +254,7 @@ static void nRF54_setup()
 
     case NRF54_LR2021EVK1XCS1:
     default:
+      Serial.setPins(SOC_GPIO_PIN_CONS_EVK_RX, SOC_GPIO_PIN_CONS_EVK_TX);
       Wire.setPins(SOC_GPIO_PIN_EVK_SDA, SOC_GPIO_PIN_EVK_SCL);
 
       lmic_pins.nss  = SOC_GPIO_PIN_EVK_SS;
@@ -282,6 +284,8 @@ static void nRF54_setup()
 
       break;
   }
+
+  Serial.begin(SERIAL_OUT_BR, SERIAL_OUT_BITS);
 }
 
 static void nRF54_post_init()
@@ -476,11 +480,19 @@ static void nRF54_SPI_begin()
   switch (nRF54_board)
   {
     case NRF54_MX25LE02:
+      SPI.setPins(SOC_GPIO_PIN_MX25_SCK,
+                  SOC_GPIO_PIN_MX25_MISO,
+                  SOC_GPIO_PIN_MX25_MOSI,
+                  SOC_GPIO_PIN_MX25_SS);
       SPI.begin(SOC_GPIO_PIN_MX25_SS);
       break;
 
     case NRF54_LR2021EVK1XCS1:
     default:
+      SPI.setPins(SOC_GPIO_PIN_EVK_SCK,
+                  SOC_GPIO_PIN_EVK_MISO,
+                  SOC_GPIO_PIN_EVK_MOSI,
+                  SOC_GPIO_PIN_EVK_SS);
       SPI.begin(SOC_GPIO_PIN_EVK_SS);
       break;
   }
@@ -488,6 +500,20 @@ static void nRF54_SPI_begin()
 
 static void nRF54_swSer_begin(unsigned long baud)
 {
+  switch (nRF54_board)
+  {
+    case NRF54_MX25LE02:
+      Serial_GNSS_In.setPins(SOC_GPIO_PIN_GNSS_MX25_RX,
+                             SOC_GPIO_PIN_GNSS_MX25_TX);
+      break;
+
+    case NRF54_LR2021EVK1XCS1:
+    default:
+      Serial_GNSS_In.setPins(SOC_GPIO_PIN_GNSS_EVK_RX,
+                             SOC_GPIO_PIN_GNSS_EVK_TX);
+      break;
+  }
+
   Serial_GNSS_In.begin(baud);
 }
 
