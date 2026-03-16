@@ -816,6 +816,82 @@ DB_ops_t nRF54_ADB_ops = {
   nRF54_ADB_query
 };
 
+#if !defined(EXCLUDE_BLUETOOTH)
+#include "../driver/WiFi.h"
+
+#include "ble_nus.h"
+
+String BT_name = HOSTNAME;
+
+static BleRadio g_ble;
+static BleNordicUart g_nus(g_ble);
+
+static constexpr int8_t kTxPowerDbm = 0;
+static const uint8_t kAddress[6] = {0x35, 0x00, 0x15, 0x54, 0xDE, 0xC0};
+static const uint8_t kNusScanResponse[] = {
+    17, 0x07,
+    0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0,
+    0x93, 0xF3, 0xA3, 0xB5, 0x01, 0x00, 0x40, 0x6E};
+
+static void nRF54_Bluetooth_setup()
+{
+  char id_06x[8];
+  snprintf(id_06x, sizeof(id_06x),"%06x", SoC->getChipId() & 0x00FFFFFFU);
+  BT_name += "-";
+  BT_name += String(id_06x);
+
+  bool ok;
+  ok = g_ble.begin(kTxPowerDbm) &&
+       g_ble.setDeviceAddress(kAddress, BleAddressType::kRandomStatic) &&
+       g_ble.setAdvertisingPduType(BleAdvPduType::kAdvInd) &&
+       g_ble.setAdvertisingName(BT_name, true) &&
+       g_ble.setScanResponseData(kNusScanResponse, sizeof(kNusScanResponse)) &&
+       g_ble.setGattDeviceName(BT_name) &&
+       g_ble.clearCustomGatt() && g_nus.begin();
+}
+
+static void nRF54_Bluetooth_loop()
+{
+
+}
+
+static void nRF54_Bluetooth_fini()
+{
+
+}
+
+static int nRF54_Bluetooth_available()
+{
+  int rval = 0;
+
+  return rval;
+}
+
+static int nRF54_Bluetooth_read()
+{
+  int rval = -1;
+
+  return rval;
+}
+
+static size_t nRF54_Bluetooth_write(const uint8_t *buffer, size_t size)
+{
+  size_t rval = size;
+
+  return rval;
+}
+
+IODev_ops_t nRF54_Bluetooth_ops = {
+  "nRF54 Bluetooth",
+  nRF54_Bluetooth_setup,
+  nRF54_Bluetooth_loop,
+  nRF54_Bluetooth_fini,
+  nRF54_Bluetooth_available,
+  nRF54_Bluetooth_read,
+  nRF54_Bluetooth_write
+};
+#endif /* EXCLUDE_BLUETOOTH */
+
 const SoC_ops_t nRF54_ops = {
   SOC_NRF54,
   "nRF54",
@@ -843,7 +919,11 @@ const SoC_ops_t nRF54_ops = {
   nRF54_SPI_begin,
   nRF54_swSer_begin,
   nRF54_swSer_enableRx,
+#if !defined(EXCLUDE_BLUETOOTH)
+  &nRF54_Bluetooth_ops,
+#else
   NULL,
+#endif /* EXCLUDE_BLUETOOTH */
   NULL,
   NULL,
   nRF54_Display_setup,
