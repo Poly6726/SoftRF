@@ -5476,6 +5476,11 @@ static void lr20xx_setup()
   radio_g4->setPacketReceivedAction(lr20xx_receive_handler);
 }
 
+#define ES1090_MONITOR_INTERVAL 30000
+
+static unsigned long lr20xx_rx_monitor_marker = 0;
+static unsigned long lr20xx_last_rx_marker    = 0;
+
 static bool lr20xx_receive()
 {
   bool success = false;
@@ -5483,6 +5488,16 @@ static bool lr20xx_receive()
 
   if (settings->power_save & POWER_SAVE_NORECEIVE) {
     return success;
+  }
+
+  if (rl_protocol->type     == RF_PROTOCOL_ADSB_1090 &&
+      lr20xx_receive_active == true                  &&
+      millis() - lr20xx_rx_monitor_marker > ES1090_MONITOR_INTERVAL) {
+    if (millis() - lr20xx_last_rx_marker > (ES1090_MONITOR_INTERVAL / 2)) {
+      radio_g4->finishReceive();
+      lr20xx_receive_active = false;
+    }
+    lr20xx_rx_monitor_marker = millis();
   }
 
   if (!lr20xx_receive_active) {
@@ -5518,6 +5533,8 @@ static bool lr20xx_receive()
 
         u1_t crc8, pkt_crc8;
         u2_t crc16, pkt_crc16;
+
+        lr20xx_last_rx_marker = millis();
 
         RadioLib_DataPacket *RL_rxPacket_ptr = &RL_rxPacket;
 
