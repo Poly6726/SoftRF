@@ -5494,7 +5494,7 @@ static bool lr20xx_receive()
       lr20xx_receive_active == true                  &&
       millis() - lr20xx_rx_monitor_marker > ES1090_MONITOR_INTERVAL) {
     if (millis() - lr20xx_last_rx_marker > (ES1090_MONITOR_INTERVAL / 2)) {
-      radio_g4->finishReceive();
+      rl_state = radio_g4->finishReceive();
       lr20xx_receive_active = false;
     }
     lr20xx_rx_monitor_marker = millis();

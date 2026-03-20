@@ -4331,7 +4331,7 @@ static void ESP32_EEPROM_extension(int cmd)
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32P4)
   if (cmd == EEPROM_EXT_LOAD || cmd == EEPROM_EXT_DEFAULTS) {
-    if ( ESP32_has_spiflash && FATFS_is_mounted ) {
+    if (FATFS_is_mounted) {
       File32 file = fatfs.open(SETTINGS_JSON_PATH, FILE_READ);
 
       if (file) {
