@@ -41,6 +41,10 @@
 #define SOC_GPIO_PIN_EVK_BUTTON_AUX     PIN_D14        // D14, P2.09 +, EVK, NO PULLUP
 #define SOC_GPIO_PIN_EVK_D15            PIN_D15        // D15, P2.06 +
 
+#define SOC_GPIO_PIN_EVK_IMU_INT        PIN_IMU_INT    //      P0.02 +
+#define SOC_GPIO_PIN_EVK_PDM_CLK        PIN_PDM_CLK    //      P1.12 +
+#define SOC_GPIO_PIN_EVK_PDM_DATA       PIN_PDM_DATA   //      P1.13 +
+
 #else
 
 /* Peripherals */
@@ -90,6 +94,10 @@
 #define SOC_GPIO_PIN_EVK_D12            _PINNUM(0,  4) // D12, P0.04 +
 #define SOC_GPIO_PIN_EVK_BUTTON_AUX     _PINNUM(2,  9) // D14, P2.09 +, EVK, NO PULLUP
 #define SOC_GPIO_PIN_EVK_D15            _PINNUM(2,  6) // D15, P2.06 +
+
+#define SOC_GPIO_PIN_EVK_IMU_INT        _PINNUM(0,  2) //      P0.02 +
+#define SOC_GPIO_PIN_EVK_PDM_CLK        _PINNUM(1, 12) //      P1.12 +
+#define SOC_GPIO_PIN_EVK_PDM_DATA       _PINNUM(1, 13) //      P1.13 +
 #endif /* ARDUINO_XIAO_NRF54L15 */
 
 #define SOC_ADC_EVK_VOLTAGE_DIV         (2.0F)         // 10K + 10K voltage divider on VBAT
