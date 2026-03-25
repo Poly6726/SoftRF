@@ -760,7 +760,10 @@ static void nRF54_Button_setup()
   }
 
   // Button(s) uses external pull up resistor.
-  pinMode(mode_button_pin, INPUT);
+  pinMode(mode_button_pin, nRF54_getChipId() == 0x21A44298 ? INPUT_PULLUP :
+                           nRF54_getChipId() == 0xFCE0D9E0 ? INPUT_PULLUP :
+                           INPUT);
+  button_1.init(mode_button_pin, HIGH);
 
   // Configure the ButtonConfig with the event handler, and enable all higher
   // level events.
