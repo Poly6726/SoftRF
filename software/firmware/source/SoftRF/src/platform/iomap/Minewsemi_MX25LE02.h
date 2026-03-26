@@ -12,7 +12,7 @@
 /* SPI */
 #define SOC_GPIO_PIN_MX25_MOSI          PIN_D10        // D10, P2.02
 #define SOC_GPIO_PIN_MX25_MISO          PIN_D9         // D9,  P2.04
-#define SOC_GPIO_PIN_MX25_SCK           _PINNUM(2,  1) // P2.01
+#define SOC_GPIO_PIN_MX25_SCK           PIN_D8         // D8,  P2.01
 #define SOC_GPIO_PIN_MX25_SS            PIN_RF_SW_CTL  //      P2.05
 
 /* SX1262 */

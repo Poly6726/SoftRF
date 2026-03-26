@@ -10,13 +10,13 @@
 #define SOC_GPIO_PIN_GNSS_EVK_PPS       PIN_D13        // D13, P2.10 +
 
 /* SPI */
-#define SOC_GPIO_PIN_EVK_MOSI           PIN_D10        // D10, P2.02 +
-#define SOC_GPIO_PIN_EVK_MISO           PIN_D9         // D9,  P2.04 +
-#define SOC_GPIO_PIN_EVK_SCK            PIN_D8         // D8,  P2.06 +
-#define SOC_GPIO_PIN_EVK_SS             PIN_D3         // D3,  P1.07 +
+#define SOC_GPIO_PIN_EVK_MOSI           PIN_D10        // D10, P2.02 + SD0
+#define SOC_GPIO_PIN_EVK_MISO           PIN_D9         // D9,  P2.04 + IO15
+#define SOC_GPIO_PIN_EVK_SCK            PIN_D8         // D8,  P2.01 + CLK
+#define SOC_GPIO_PIN_EVK_SS             PIN_D3         // D3,  P1.07 + SD2
 
 /* LR2021 */
-#define SOC_GPIO_PIN_EVK_RST            PIN_D2         // D2,  P1.06 +
+#define SOC_GPIO_PIN_EVK_RST            PIN_D2         // D2,  P1.06 + IO13
 #define SOC_GPIO_PIN_EVK_DIO7           PIN_D6         // D6,  P2.07 +
 #define SOC_GPIO_PIN_EVK_DIO8           PIN_D0         // D0,  P1.04 +
 #define SOC_GPIO_PIN_EVK_DIO11          PIN_D7         // D7,  P2.08 +
@@ -58,7 +58,7 @@
 /* SPI */
 #define SOC_GPIO_PIN_EVK_MOSI           _PINNUM(2,  2) // D10, P2.02 +
 #define SOC_GPIO_PIN_EVK_MISO           _PINNUM(2,  4) // D9,  P2.04 +
-#define SOC_GPIO_PIN_EVK_SCK            _PINNUM(2,  6) // D8,  P2.06 +
+#define SOC_GPIO_PIN_EVK_SCK            _PINNUM(2,  1) // D8,  P2.01 +
 #define SOC_GPIO_PIN_EVK_SS             _PINNUM(1,  7) // D3,  P1.07 +
 
 /* LR2021 */

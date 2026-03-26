@@ -182,5 +182,11 @@ struct rst_info {
 #define U8X8_OLED_I2C_BUS_TYPE  U8X8_SSD1306_128X64_NONAME_HW_I2C
 #endif /* USE_OLED */
 
+//#include <SoftSPI.h>
+//extern  SoftSPI RadioSPI;
+//#undef  SPI
+//#define SPI                   RadioSPI
+//#define USE_SOFTSPI
+
 #endif /* PLATFORM_NRF54_H */
 #endif /* ARDUINO_ARCH_NRF54L15CLEAN */

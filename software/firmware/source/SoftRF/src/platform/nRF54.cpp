@@ -83,6 +83,13 @@ settings_t *settings = &eeprom_block.field.settings;
 char UDPpacketBuffer[256]; // Dummy definition to satisfy build sequence
 #endif /* EXCLUDE_WIFI */
 
+#if defined(USE_SOFTSPI)
+#include <SoftSPI.h>
+SoftSPI RadioSPI(SOC_GPIO_PIN_EVK_MOSI,
+                 SOC_GPIO_PIN_EVK_MISO,
+                 SOC_GPIO_PIN_EVK_SCK);
+#endif /* USE_SOFTSPI */
+
 char *dtostrf_workaround(double number, signed char width, unsigned char prec, char *s) {
     bool negative = false;
 
@@ -477,6 +484,9 @@ static void nRF54_EEPROM_extension(int cmd)
 
 static void nRF54_SPI_begin()
 {
+#if defined(USE_SOFTSPI)
+  SPI.begin();
+#else
   switch (nRF54_board)
   {
     case NRF54_MX25LE02:
@@ -496,6 +506,7 @@ static void nRF54_SPI_begin()
       SPI.begin(SOC_GPIO_PIN_EVK_SS);
       break;
   }
+#endif /* USE_SOFTSPI */
 }
 
 static void nRF54_swSer_begin(unsigned long baud)
