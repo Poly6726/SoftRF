@@ -2,12 +2,12 @@
 
 #if defined(ARDUINO_XIAO_NRF54L15)
 /* Peripherals */
-#define SOC_GPIO_PIN_CONS_EVK_RX        PIN_SAMD11_TX  // D19, P1.08 +
-#define SOC_GPIO_PIN_CONS_EVK_TX        PIN_SAMD11_RX  // D18, P1.09 +
+#define SOC_GPIO_PIN_CONS_EVK_RX        PIN_SAMD11_TX  // D19, P1.08 + SD3
+#define SOC_GPIO_PIN_CONS_EVK_TX        PIN_SAMD11_RX  // D18, P1.09 + VN
 
-#define SOC_GPIO_PIN_GNSS_EVK_RX        PIN_D7         // D7,  P2.08 +
-#define SOC_GPIO_PIN_GNSS_EVK_TX        PIN_D6         // D6,  P2.07 +
-#define SOC_GPIO_PIN_GNSS_EVK_PPS       PIN_D13        // D13, P2.10 +
+#define SOC_GPIO_PIN_GNSS_EVK_RX        PIN_D7         // D7,  P2.07 + IO4
+#define SOC_GPIO_PIN_GNSS_EVK_TX        PIN_D6         // D6,  P2.08 + IO16
+#define SOC_GPIO_PIN_GNSS_EVK_PPS       PIN_D13        // D13, P2.10 + IO5
 
 /* SPI */
 #define SOC_GPIO_PIN_EVK_MOSI           PIN_D10        // D10, P2.02 + SD0
@@ -18,13 +18,13 @@
 /* LR2021 */
 #define SOC_GPIO_PIN_EVK_RST            PIN_D2         // D2,  P1.06 + IO13
 #define SOC_GPIO_PIN_EVK_DIO7           PIN_D6         // D6,  P2.07 +
-#define SOC_GPIO_PIN_EVK_DIO8           PIN_D0         // D0,  P1.04 +
+#define SOC_GPIO_PIN_EVK_DIO8           PIN_D0         // D0,  P1.04 + IO14
 #define SOC_GPIO_PIN_EVK_DIO11          PIN_D7         // D7,  P2.08 +
-#define SOC_GPIO_PIN_EVK_BUSY           PIN_D1         // D1,  P1.05 +
+#define SOC_GPIO_PIN_EVK_BUSY           PIN_D1         // D1,  P1.05 + IO12
 
 /* I2C */
-#define SOC_GPIO_PIN_EVK_SDA            PIN_D4         // D4,  P1.10 +
-#define SOC_GPIO_PIN_EVK_SCL            PIN_D5         // D5,  P1.11 +
+#define SOC_GPIO_PIN_EVK_SDA            PIN_D4         // D4,  P1.10 + VP
+#define SOC_GPIO_PIN_EVK_SCL            PIN_D5         // D5,  P1.11 + IO34
 
 /* antenna switch */
 #define SOC_GPIO_PIN_EVK_ANT_SW         PIN_RF_SW_CTL  //      P2.05 +
@@ -51,8 +51,8 @@
 #define SOC_GPIO_PIN_CONS_EVK_RX        _PINNUM(1,  8) // D19, P1.08 +
 #define SOC_GPIO_PIN_CONS_EVK_TX        _PINNUM(1,  9) // D18, P1.09 +
 
-#define SOC_GPIO_PIN_GNSS_EVK_RX        _PINNUM(2,  8) // D7,  P2.08 +
-#define SOC_GPIO_PIN_GNSS_EVK_TX        _PINNUM(2,  7) // D6,  P2.07 +
+#define SOC_GPIO_PIN_GNSS_EVK_RX        _PINNUM(2,  7) // D7,  P2.07 +
+#define SOC_GPIO_PIN_GNSS_EVK_TX        _PINNUM(2,  8) // D6,  P2.08 +
 #define SOC_GPIO_PIN_GNSS_EVK_PPS       _PINNUM(2, 10) // D13, P2.10 +
 
 /* SPI */

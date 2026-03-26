@@ -5,8 +5,8 @@
 #define SOC_GPIO_PIN_CONS_MX25_RX       PIN_D0         // D0,  P1.04
 #define SOC_GPIO_PIN_CONS_MX25_TX       PIN_D1         // D1,  P1.05
 
-#define SOC_GPIO_PIN_GNSS_MX25_RX       PIN_D7         // D7,  P2.08
-#define SOC_GPIO_PIN_GNSS_MX25_TX       PIN_D6         // D6,  P2.07
+#define SOC_GPIO_PIN_GNSS_MX25_RX       PIN_D7         // D7,  P2.07
+#define SOC_GPIO_PIN_GNSS_MX25_TX       PIN_D6         // D6,  P2.08
 #define SOC_GPIO_PIN_GNSS_MX25_PPS      PIN_D13        // D13, P2.10
 
 /* SPI */
@@ -43,8 +43,8 @@
 #define SOC_GPIO_PIN_CONS_MX25_RX       _PINNUM(1,  4) // P1.04 +
 #define SOC_GPIO_PIN_CONS_MX25_TX       _PINNUM(1,  5) // P1.05 +
 
-#define SOC_GPIO_PIN_GNSS_MX25_RX       _PINNUM(2,  8) // P2.08 +
-#define SOC_GPIO_PIN_GNSS_MX25_TX       _PINNUM(2,  7) // P2.07 +
+#define SOC_GPIO_PIN_GNSS_MX25_RX       _PINNUM(2,  7) // P2.07 +
+#define SOC_GPIO_PIN_GNSS_MX25_TX       _PINNUM(2,  8) // P2.08 +
 #define SOC_GPIO_PIN_GNSS_MX25_PPS      _PINNUM(2, 10) // P2.10 +
 
 /* SPI */
