@@ -144,7 +144,7 @@ Academy|[Nanjing Qinheng Microelectronics](https://www.wch-ic.com/)<br>[CH32V307
 [**Concorde**](https://github.com/lyusupov/SoftRF/wiki/Concorde-Edition)&nbsp;![](https://github.com/lyusupov/SoftRF/raw/master/documents/images/new-icon.jpg)|[Espressif<br>ESP32-P4](https://en.wikipedia.org/wiki/ESP32#ESP32-P4)|Q3 2025|![](https://github.com/lyusupov/SoftRF/raw/master/documents/images/icon_may_need_imp.png)|
 **Academy**|[Espressif<br>ESP32-C5](https://en.wikipedia.org/wiki/ESP32#ESP32-C5)|Q3 2025|![](https://github.com/lyusupov/SoftRF/raw/master/documents/images/icon_may_need_imp.png)|
 [**Labubu**](https://github.com/lyusupov/SoftRF/wiki/Labubu-Edition)![](https://github.com/lyusupov/SoftRF/raw/master/documents/images/new-icon.jpg)|[STMicroelectronics](https://en.wikipedia.org/wiki/STMicroelectronics)<br>[STM32**WL55**](https://www.st.com/en/microcontrollers-microprocessors/stm32wl55cc.html)|Q4 2025|![](https://github.com/lyusupov/SoftRF/raw/master/documents/images/icon_may_need_imp.png)|
-**Academy**|[Nordic Semiconductor<br>nRF54L15](https://www.nordicsemi.com/Products/nRF54L15)|Q1 2026|![](https://github.com/lyusupov/SoftRF/raw/master/documents/images/icon_in_progress.png)|
+**Academy**|[Nordic Semiconductor<br>nRF54L15](https://www.nordicsemi.com/Products/nRF54L15)|Q1 2026|![](https://github.com/lyusupov/SoftRF/raw/master/documents/images/icon_may_need_imp.png)|
 
 ## By sub-1 GHz radio
 Radio|Model(s)|First appearance|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Status&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|Notes

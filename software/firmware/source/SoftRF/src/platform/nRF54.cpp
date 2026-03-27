@@ -236,6 +236,35 @@ static void nRF54_setup()
 #endif
   }
 
+  Wire.setPins(SOC_GPIO_PIN_EVK_SDA, SOC_GPIO_PIN_EVK_SCL);
+  Wire.begin();
+  Wire.beginTransmission(SSD1306_OLED_I2C_ADDR);
+  if (Wire.endTransmission() == 0) {
+    nRF54_board = NRF54_LR2021EVK1XCS1;
+  }
+  // Wire.end();
+
+#if 0
+  pinMode(SOC_GPIO_PIN_MX25_RST,  OUTPUT);
+  pinMode(SOC_GPIO_PIN_MX25_BUSY, INPUT);
+
+  digitalWrite(SOC_GPIO_PIN_MX25_RST, LOW);
+
+  delay(10);
+
+  if (digitalRead(SOC_GPIO_PIN_MX25_BUSY) == HIGH) {
+    digitalWrite(SOC_GPIO_PIN_MX25_RST, HIGH);
+
+    delay(50);
+
+    if (digitalRead(SOC_GPIO_PIN_MX25_BUSY) == LOW) {
+    nRF54_board = NRF54_MX25LE02;
+    }
+  }
+
+  pinMode(SOC_GPIO_PIN_MX25_RST, INPUT);
+#endif
+
   switch (nRF54_board)
   {
     case NRF54_MX25LE02:
@@ -262,7 +291,6 @@ static void nRF54_setup()
     case NRF54_LR2021EVK1XCS1:
     default:
       Serial.setPins(SOC_GPIO_PIN_CONS_EVK_RX, SOC_GPIO_PIN_CONS_EVK_TX);
-      Wire.setPins(SOC_GPIO_PIN_EVK_SDA, SOC_GPIO_PIN_EVK_SCL);
 
       lmic_pins.nss  = SOC_GPIO_PIN_EVK_SS;
       lmic_pins.rst  = SOC_GPIO_PIN_EVK_RST;
@@ -297,12 +325,37 @@ static void nRF54_setup()
 
 static void nRF54_post_init()
 {
-  if (nRF54_board == NRF54_LR2021EVK1XCS1) {
-    Serial.println();
-    Serial.println(F("Board: Seeed & Semtech LR2021EVK1XCS1"));
-    Serial.println();
-    Serial.flush();
-  }
+  Serial.println();
+  Serial.println(F("SoftRF Academy Edition Power-on Self Test"));
+  Serial.println();
+  Serial.flush();
+
+  Serial.print(F("Board: "));
+  Serial.println(nRF54_board == NRF54_LR2021EVK1XCS1 ?
+                 "Seeed & Semtech LR2021EVK1XCS1" : "Minewsemi MX25LE02");
+  Serial.println();
+  Serial.flush();
+
+  Serial.println(F("Built-in components:"));
+
+  Serial.print(F("RADIO   : "));
+  Serial.println(hw_info.rf      != RF_IC_NONE        ? F("PASS") : F("FAIL"));
+
+  Serial.println();
+
+  Serial.println(F("External components:"));
+
+  Serial.print(F("GNSS    : "));
+  Serial.println(hw_info.gnss    != GNSS_MODULE_NONE  ? F("PASS") : F("FAIL"));
+  Serial.print(F("BARO    : "));
+  Serial.println(hw_info.baro    != BARO_MODULE_NONE  ? F("PASS") : F("N/A"));
+  Serial.print(F("DISPLAY : "));
+  Serial.println(hw_info.display != DISPLAY_NONE      ? F("PASS") : F("N/A"));
+
+  Serial.println();
+  Serial.println(F("Power-on Self Test is complete."));
+  Serial.println();
+  Serial.flush();
 
   Serial.println(F("Data output device(s):"));
 
@@ -310,7 +363,6 @@ static void nRF54_post_init()
   switch (settings->nmea_out)
   {
     case NMEA_UART       :  Serial.println(F("UART"));          break;
-    case NMEA_USB        :  Serial.println(F("USB CDC"));       break;
     case NMEA_BLUETOOTH  :  Serial.println(F("Bluetooth LE"));  break;
     case NMEA_OFF        :
     default              :  Serial.println(F("NULL"));          break;
@@ -320,7 +372,6 @@ static void nRF54_post_init()
   switch (settings->gdl90)
   {
     case GDL90_UART      :  Serial.println(F("UART"));          break;
-    case GDL90_USB       :  Serial.println(F("USB CDC"));       break;
     case GDL90_BLUETOOTH :  Serial.println(F("Bluetooth LE"));  break;
     case GDL90_OFF       :
     default              :  Serial.println(F("NULL"));          break;
@@ -330,7 +381,6 @@ static void nRF54_post_init()
   switch (settings->d1090)
   {
     case D1090_UART      :  Serial.println(F("UART"));          break;
-    case D1090_USB       :  Serial.println(F("USB CDC"));       break;
     case D1090_BLUETOOTH :  Serial.println(F("Bluetooth LE"));  break;
     case D1090_OFF       :
     default              :  Serial.println(F("NULL"));          break;
@@ -429,10 +479,12 @@ static void nRF54_Sound_test(int var)
 {
 #if defined(USE_PWM_SOUND)
   if (SOC_GPIO_PIN_BUZZER != SOC_UNUSED_PIN && settings->volume != BUZZER_OFF) {
-    tone(SOC_GPIO_PIN_BUZZER, 440,  500); delay(500);
-    tone(SOC_GPIO_PIN_BUZZER, 640,  500); delay(500);
-    tone(SOC_GPIO_PIN_BUZZER, 840,  500); delay(500);
-    tone(SOC_GPIO_PIN_BUZZER, 1040, 500); delay(600);
+    pinMode(SOC_GPIO_PIN_BUZZER, OUTPUT);
+
+    tone(SOC_GPIO_PIN_BUZZER, 440,  500); // delay(500);
+    tone(SOC_GPIO_PIN_BUZZER, 640,  500); // delay(500);
+    tone(SOC_GPIO_PIN_BUZZER, 840,  500); // delay(500);
+    tone(SOC_GPIO_PIN_BUZZER, 1040, 500); // delay(600);
 
     noTone(SOC_GPIO_PIN_BUZZER);
     pinMode(SOC_GPIO_PIN_BUZZER, INPUT);
@@ -445,6 +497,7 @@ static void nRF54_Sound_tone(int hz, uint8_t volume)
 #if defined(USE_PWM_SOUND)
   if (SOC_GPIO_PIN_BUZZER != SOC_UNUSED_PIN && volume != BUZZER_OFF) {
     if (hz > 0) {
+      pinMode(SOC_GPIO_PIN_BUZZER, OUTPUT);
       tone(SOC_GPIO_PIN_BUZZER, hz, ALARM_TONE_MS);
     } else {
       noTone(SOC_GPIO_PIN_BUZZER);
