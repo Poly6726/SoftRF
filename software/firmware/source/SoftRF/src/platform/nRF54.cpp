@@ -404,8 +404,65 @@ static void nRF54_loop()
   }
 }
 
+static uint32_t nRF54_getChipId(void);
+
 static void nRF54_fini(int reason)
 {
+  switch (nRF54_board)
+  {
+    case NRF54_MX25LE02:
+      digitalWrite(SOC_GPIO_PIN_MX25_STATUS, !LED_STATE_ON);
+      pinMode(SOC_GPIO_PIN_MX25_STATUS,      INPUT);
+
+      pinMode(SOC_GPIO_PIN_MX25_ANT_SW2,     INPUT);
+      break;
+
+    case NRF54_LR2021EVK1XCS1:
+    default:
+      digitalWrite(SOC_GPIO_PIN_EVK_STATUS,  !LED_STATE_ON);
+      pinMode(SOC_GPIO_PIN_EVK_STATUS,       INPUT);
+
+      pinMode(SOC_GPIO_PIN_EVK_BUTTON_AUX,   INPUT);
+      pinMode(SOC_GPIO_PIN_EVK_ANT_PWR,      INPUT);
+
+      #if defined(ARDUINO_XIAO_NRF54L15)
+      BoardControl::setBatterySenseEnabled(false);
+      #else
+      pinMode(SOC_GPIO_PIN_EVK_VBAT_EN,      INPUT);
+      pinMode(SOC_GPIO_PIN_EVK_ANT_SW,       INPUT);
+      #endif /* ARDUINO_XIAO_NRF54L15 */
+
+      break;
+  }
+
+  Serial_GNSS_In.end();
+  Wire.end();
+
+  pinMode(lmic_pins.nss, INPUT_PULLUP);
+  pinMode(lmic_pins.rst, INPUT);
+
+  int mode_button_pin;
+
+  switch (nRF54_board)
+  {
+    case NRF54_MX25LE02:
+      mode_button_pin = SOC_GPIO_PIN_MX25_BUTTON;
+      break;
+
+    case NRF54_LR2021EVK1XCS1:
+    default:
+      mode_button_pin = SOC_GPIO_PIN_EVK_BUTTON;
+      break;
+  }
+
+  pinMode(mode_button_pin, nRF54_getChipId() == 0x21A44298 ? INPUT_PULLUP :
+                           nRF54_getChipId() == 0xFCE0D9E0 ? INPUT_PULLUP :
+                           INPUT);
+  while (digitalRead(mode_button_pin) == LOW);
+  delay(100);
+
+  Serial.end();
+
   g_regulators->SYSTEMOFF = REGULATORS_SYSTEMOFF_SYSTEMOFF_Enter;
 
   __asm volatile("dsb 0xF" ::: "memory");
