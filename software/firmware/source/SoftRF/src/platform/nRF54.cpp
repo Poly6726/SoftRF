@@ -404,7 +404,39 @@ static void nRF54_loop()
   }
 }
 
+static PowerManager g_powerManager;
 static uint32_t nRF54_getChipId(void);
+
+static constexpr uint8_t kSystemOffMagic = 0xA5U;
+
+static void configureButtonSenseLowWake() {
+  if (kPinUserButton.port != 0U) {
+    return;
+  }
+
+  (void)Gpio::configure(kPinUserButton, GpioDirection::kInput,
+                        nRF54_getChipId() == 0x21A44298 ? GpioPull::kPullUp :
+                        nRF54_getChipId() == 0xFCE0D9E0 ? GpioPull::kPullUp :
+                        GpioPull::kDisabled);
+
+  // SYSTEM OFF wake is done through the GPIO DETECT sense mechanism, not
+  // through a normal attachInterrupt() wake path.
+  uint32_t cnf = NRF_P0->PIN_CNF[kPinUserButton.pin];
+  cnf &= ~GPIO_PIN_CNF_SENSE_Msk;
+  cnf |= (GPIO_PIN_CNF_SENSE_Low << GPIO_PIN_CNF_SENSE_Pos);
+  if (nRF54_getChipId() == 0x21A44298 || nRF54_getChipId() == 0xFCE0D9E0) {
+    cnf |= GPIO_PIN_CNF_PULL_Pullup;
+  }
+  NRF_P0->PIN_CNF[kPinUserButton.pin] = cnf;
+}
+
+static void requestLowPowerLatencyMode() {
+  g_power->TASKS_LOWPWR = POWER_TASKS_LOWPWR_TASKS_LOWPWR_Trigger;
+}
+
+static void writeGpregret0(uint8_t value) {
+  g_power->GPREGRET[0] = static_cast<uint32_t>(value);
+}
 
 static void nRF54_fini(int reason)
 {
@@ -461,6 +493,7 @@ static void nRF54_fini(int reason)
   while (digitalRead(mode_button_pin) == LOW);
   delay(100);
 
+#if 0
   Serial.end();
 
   g_regulators->SYSTEMOFF = REGULATORS_SYSTEMOFF_SYSTEMOFF_Enter;
@@ -470,11 +503,42 @@ static void nRF54_fini(int reason)
   while (true) {
     cpuIdleWfi();
   }
+#else
+  configureButtonSenseLowWake();
+  requestLowPowerLatencyMode();
+  writeGpregret0(kSystemOffMagic);
+
+  Serial.println("Entering SYSTEM OFF. Wake by pressing USER button.");
+  Serial.flush();
+  delay(2);
+  Serial.end();
+
+  g_powerManager.systemOffNoRetention();
+#endif
 }
 
 static void nRF54_reset()
 {
-  SoftReset();
+  if (wdt_is_active && g_wdt.isRunning()) {
+    switch (hw_info.display)
+    {
+#if defined(USE_OLED)
+    case DISPLAY_OLED_1_3:
+    case DISPLAY_OLED_TTGO:
+    case DISPLAY_OLED_HELTEC:
+      OLED_fini(SOFTRF_SHUTDOWN_NONE);
+      break;
+#endif /* USE_OLED */
+
+    case DISPLAY_NONE:
+    default:
+      break;
+    }
+
+    while (true) { delay(100); }
+  } else {
+    SoftReset();
+  }
 }
 
 static uint32_t nRF54_getChipId()
