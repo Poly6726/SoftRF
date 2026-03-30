@@ -37,20 +37,11 @@
 #define uni_Color(r,g,b)        strip.Color(r,g,b)
 #define color_t                 uint32_t
 
-//#define PROGMEM
-//#define PGM_P                   const char *
-//#define PGM_VOID_P              const void *
-
-//#define PSTR(s)                 (s)
-
-//#define pgm_read_byte(addr)     (*(const unsigned char *)(addr))
-//#define pgm_read_word(addr)     (*(const unsigned short *)(addr))
-
 extern char *dtostrf_workaround(double, signed char, unsigned char, char *);
 #define dtostrf                 dtostrf_workaround
 
 #define snprintf_P              snprintf
-#define EEPROM_commit()         {}
+#define EEPROM_commit()         EEPROM.commit()
 
 // State when LED is litted
 #define LED_STATE_ON            LOW
