@@ -402,6 +402,21 @@ static void nRF54_loop()
   if (wdt_is_active && g_wdt.isRunning()) {
     g_wdt.feed();
   }
+
+#if defined(NOT_AN_INTERRUPT)
+  if (SOC_GPIO_PIN_GNSS_PPS != SOC_UNUSED_PIN) {
+    static bool prev_PPS_state = LOW;
+
+    if (digitalPinToInterrupt(SOC_GPIO_PIN_GNSS_PPS) == NOT_AN_INTERRUPT) {
+      bool PPS_state = digitalRead(SOC_GPIO_PIN_GNSS_PPS);
+
+      if (PPS_state == HIGH && prev_PPS_state == LOW) {
+        PPS_TimeMarker = millis();
+      }
+      prev_PPS_state = PPS_state;
+    }
+  }
+#endif
 }
 
 static PowerManager g_powerManager;
