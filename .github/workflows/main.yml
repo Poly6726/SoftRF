@@ -533,6 +533,8 @@ jobs:
             unzip zephyr_hci.zip ;
             rm zephyr_hci.zip ;
             mv ArduinoBLE-zephyr_hci $HOME/Arduino/libraries/ ;
+            cd $HOME/.arduino15/packages/arduino/hardware/zephyr_main/0.54.1 ;
+            sed -i "s\nano33ble.upload.maximum_size=98304\nano33ble.upload.maximum_size=786432\g" boards.txt ;
             cd $GITHUB_WORKSPACE ;
           fi
 
