@@ -89,6 +89,7 @@ typedef struct SoC_ops_struct {
   void (*Button_setup)();
   void (*Button_loop)();
   void (*Button_fini)();
+  void (*TTS)(char *);
   DB_ops_t *ADB_ops;
 } SoC_ops_t;
 

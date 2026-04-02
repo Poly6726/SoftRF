@@ -548,53 +548,6 @@ ICM_20948_I2C     imu_icm20948;
 #if defined(USE_DSI)
 #include "../driver/DSI.h"
 #endif /* USE_DSI */
-
-static void ESP32_TTS(char *message)
-{
-  char filename[MAX_FILENAME_LEN];
-
-  if (ui->voice != VOICE_OFF) {
-
-    if (!FATFS_is_mounted)
-      return;
-
-    if (hw_info.display == DISPLAY_TFT_WIRELESSTAG_7 ||
-        hw_info.display == DISPLAY_TFT_LILYGO_4_05   ||
-        hw_info.display == DISPLAY_AMOLED_LILYGO_4_1) {
-      // EPD_Message("VOICE", "ALERT");
-    }
-
-    bool wdt_status = loopTaskWDTEnabled;
-
-    if (wdt_status) {
-      disableLoopWDT();
-    }
-
-    char *word = strtok (message, " ");
-
-    while (word != NULL)
-    {
-        strcpy(filename, WAV_FILE_PREFIX);
-        strcat(filename,  ui->voice == VOICE_1 ? VOICE1_SUBDIR :
-                         (ui->voice == VOICE_2 ? VOICE2_SUBDIR :
-                         (ui->voice == VOICE_3 ? VOICE3_SUBDIR :
-                          "" )));
-        strcat(filename, word);
-        strcat(filename, WAV_FILE_SUFFIX);
-        play_file(filename);
-        word = strtok (NULL, " ");
-
-        yield();
-
-        /* Poll input source(s) */
-        // Input_loop();
-    }
-
-    if (wdt_status) {
-      enableLoopWDT();
-    }
-  }
-}
 #endif /* CONFIG_IDF_TARGET_ESP32P4 */
 #endif /* CONFIG_IDF_TARGET_ESP32S3-P4 */
 
@@ -6929,6 +6882,55 @@ static void ESP32_Button_fini()
   }
 }
 
+static void ESP32_TTS(char *message)
+{
+#if defined(CONFIG_IDF_TARGET_ESP32P4)
+  char filename[MAX_FILENAME_LEN];
+
+  if (ui->voice != VOICE_OFF) {
+
+    if (!FATFS_is_mounted)
+      return;
+
+    if (hw_info.display == DISPLAY_TFT_WIRELESSTAG_7 ||
+        hw_info.display == DISPLAY_TFT_LILYGO_4_05   ||
+        hw_info.display == DISPLAY_AMOLED_LILYGO_4_1) {
+      // EPD_Message("VOICE", "ALERT");
+    }
+
+    bool wdt_status = loopTaskWDTEnabled;
+
+    if (wdt_status) {
+      disableLoopWDT();
+    }
+
+    char *word = strtok (message, " ");
+
+    while (word != NULL)
+    {
+        strcpy(filename, WAV_FILE_PREFIX);
+        strcat(filename,  ui->voice == VOICE_1 ? VOICE1_SUBDIR :
+                         (ui->voice == VOICE_2 ? VOICE2_SUBDIR :
+                         (ui->voice == VOICE_3 ? VOICE3_SUBDIR :
+                          "" )));
+        strcat(filename, word);
+        strcat(filename, WAV_FILE_SUFFIX);
+        play_file(filename);
+        word = strtok (NULL, " ");
+
+        yield();
+
+        /* Poll input source(s) */
+        // Input_loop();
+    }
+
+    if (wdt_status) {
+      enableLoopWDT();
+    }
+  }
+#endif /* CONFIG_IDF_TARGET_ESP32P4 */
+}
+
 #if defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3) || \
     defined(CONFIG_IDF_TARGET_ESP32S31)
 
@@ -8006,6 +8008,7 @@ const SoC_ops_t ESP32_ops = {
   ESP32_Button_setup,
   ESP32_Button_loop,
   ESP32_Button_fini,
+  ESP32_TTS,
 #if defined(CONFIG_IDF_TARGET_ESP32S3)  || \
     defined(CONFIG_IDF_TARGET_ESP32S31) || \
     defined(CONFIG_IDF_TARGET_ESP32P4)

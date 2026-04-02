@@ -4477,6 +4477,11 @@ static void nRF52_Button_fini()
   }
 }
 
+static void nRF52_TTS(char *message)
+{
+
+}
+
 #if defined(USE_WEBUSB_SERIAL) && !defined(USE_WEBUSB_SETTINGS)
 void line_state_callback(bool connected)
 {
@@ -4764,6 +4769,7 @@ const SoC_ops_t nRF52_ops = {
   nRF52_Button_setup,
   nRF52_Button_loop,
   nRF52_Button_fini,
+  nRF52_TTS,
   &nRF52_ADB_ops
 };
 

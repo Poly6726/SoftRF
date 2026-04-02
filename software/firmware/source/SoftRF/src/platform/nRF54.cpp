@@ -993,6 +993,11 @@ static void nRF54_Button_fini()
 
 }
 
+static void nRF54_TTS(char *message)
+{
+
+}
+
 static bool nRF54_ADB_setup()
 {
   return false;
@@ -1144,6 +1149,7 @@ const SoC_ops_t nRF54_ops = {
   nRF54_Button_setup,
   nRF54_Button_loop,
   nRF54_Button_fini,
+  nRF54_TTS,
   &nRF54_ADB_ops
 };
 

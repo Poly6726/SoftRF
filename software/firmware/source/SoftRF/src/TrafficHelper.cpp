@@ -321,7 +321,7 @@ static void Traffic_Voice()
                 "traffic %s distance %s altitude %s",
                 where, how_far, elev);
 
-    // SoC->TTS(message);
+    SoC->TTS(message);
 
     Traffic_Voice_ID_prev = traffic_by_dist[0].fop->addr;
   }
