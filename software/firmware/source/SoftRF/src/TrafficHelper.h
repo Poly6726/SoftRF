@@ -50,6 +50,9 @@ enum
 
 #define TRAFFIC_ALERT_SOUND   1
 
+#define isTimeToVoice()       (millis() - Traffic_Voice_TimeMarker > 2000)
+#define VOICE_EXPIRATION_TIME 5 /* seconds */
+
 void ParseData(void);
 void Traffic_setup(void);
 void Traffic_loop(void);
