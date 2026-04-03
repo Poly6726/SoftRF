@@ -92,6 +92,8 @@ struct rst_info {
 #define SOC_GPIO_PIN_STATUS   (hw_info.model == SOFTRF_MODEL_ACADEMY ? \
                                SOC_GPIO_PIN_EVK_STATUS : SOC_UNUSED_PIN)
 
+#define SOC_GPIO_LED_BLE      SOC_UNUSED_PIN
+
 //#define EXCLUDE_EEPROM
 #define EXCLUDE_WIFI
 #define EXCLUDE_ETHERNET
@@ -172,6 +174,8 @@ struct rst_info {
 #if defined(USE_OLED)
 #define U8X8_OLED_I2C_BUS_TYPE  U8X8_SSD1306_128X64_NONAME_HW_I2C
 #endif /* USE_OLED */
+
+extern const char *nRF5x_Device_Manufacturer, *nRF5x_Device_Model, *Hardware_Rev[];
 
 //#include <SoftSPI.h>
 //extern  SoftSPI RadioSPI;

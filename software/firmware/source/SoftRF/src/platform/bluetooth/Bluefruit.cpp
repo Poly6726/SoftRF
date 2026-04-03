@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if defined(ARDUINO_ARCH_NRF52)
+#if defined(ARDUINO_ARCH_NRF52) || defined(ARDUINO_ARCH_NRF54L15CLEAN)
 
 #include "../../system/SoC.h"
 #include "../../driver/Bluetooth.h"
@@ -80,6 +80,7 @@ const uint8_t SENSBOX_UUID_SYSTEM[] =
     0x81, 0x4B, 0x3B, 0x14, 0x00, 0x71, 0xA2, 0xAB,
 };
 
+#if defined(ARDUINO_ARCH_NRF52)
 BLESensBox::BLESensBox(void) :
   BLEService   (SENSBOX_UUID_SERVICE),
   _sensbox_nav (SENSBOX_UUID_NAVIGATION),
@@ -277,6 +278,7 @@ err_t BLEDfuSecure::begin(void)
 
     return ERROR_NONE;
 }
+#endif /* ARDUINO_ARCH_NRF52 */
 
 static unsigned long BLE_Notify_TimeMarker  = 0;
 static unsigned long BLE_SensBox_TimeMarker = 0;
@@ -297,14 +299,19 @@ static unsigned long BLE_SensBox_TimeMarker = 0;
 
 // BLE Service
 BLEDfu        bledfu;       // OTA DFU service
+#if defined(ARDUINO_ARCH_NRF52)
 BLEDfuSecure  bledfusecure;
+#endif /* ARDUINO_ARCH_NRF52 */
 BLEDis        bledis;       // device information
 BLEUart_HM10  bleuart_HM10; // TI UART over BLE
 #if !defined(EXCLUDE_NUS)
 BLEUart       bleuart_NUS;  // Nordic UART over BLE
 #endif /* EXCLUDE_NUS */
 BLEBas        blebas;       // battery
+
+#if defined(ARDUINO_ARCH_NRF52)
 BLESensBox    blesens;      // SensBox
+#endif /* ARDUINO_ARCH_NRF52 */
 
 #if defined(USE_BLE_MIDI)
 BLEMidi       blemidi;
@@ -477,8 +484,8 @@ void nRF52_Bluetooth_setup()
   //}
 
   // Configure and Start Device Information Service
-  bledis.setManufacturer(nRF52_Device_Manufacturer);
-  bledis.setModel(nRF52_Device_Model);
+  bledis.setManufacturer(nRF5x_Device_Manufacturer);
+  bledis.setModel(nRF5x_Device_Model);
   bledis.setHardwareRev(hw_info.revision > 2 ?
                         Hardware_Rev[3] : Hardware_Rev[hw_info.revision]);
   bledis.setSoftwareRev(SOFTRF_FIRMWARE_VERSION);
@@ -502,8 +509,10 @@ void nRF52_Bluetooth_setup()
   }
 #endif /* ENABLE_REMOTE_ID */
 
+#if defined(ARDUINO_ARCH_NRF52)
   // Start SensBox Service
   blesens.begin();
+#endif /* ARDUINO_ARCH_NRF52 */
 
 #if defined(USE_BLE_MIDI)
   // Initialize MIDI with no any input channels
@@ -543,6 +552,7 @@ static void nRF52_Bluetooth_loop()
     blebas.write(Battery_charge());
   }
 
+#if defined(ARDUINO_ARCH_NRF52)
   if (Bluefruit.connected() && isTimeToSensBox()) {
     uint8_t sens_status = isValidFix() ? GNSS_STATUS_3D_MOVING : GNSS_STATUS_NONE;
     blesens.notify_nav (sens_status);
@@ -551,6 +561,7 @@ static void nRF52_Bluetooth_loop()
     blesens.notify_sys (sens_status);
     BLE_SensBox_TimeMarker = millis();
   }
+#endif /* ARDUINO_ARCH_NRF52 */
 
 #if defined(ENABLE_REMOTE_ID)
   if (rid_enabled() && isValidFix()) {
@@ -567,7 +578,10 @@ static void nRF52_Bluetooth_loop()
 static void nRF52_Bluetooth_fini()
 {
   uint8_t sd_en = 0;
+
+#if defined(ARDUINO_ARCH_NRF52)
   (void) sd_softdevice_is_enabled(&sd_en);
+#endif /* ARDUINO_ARCH_NRF52 */
 
   if ( Bluefruit.connected() ) {
     if ( bleuart_HM10.notifyEnabled() ) {
@@ -587,7 +601,9 @@ static void nRF52_Bluetooth_fini()
     Bluefruit.Advertising.stop();
   }
 
+#if defined(ARDUINO_ARCH_NRF52)
   if (sd_en) sd_softdevice_disable();
+#endif /* ARDUINO_ARCH_NRF52 */
 }
 
 static int nRF52_Bluetooth_available()
@@ -656,7 +672,7 @@ static size_t nRF52_Bluetooth_write(const uint8_t *buffer, size_t size)
   return rval;
 }
 
-IODev_ops_t nRF52_Bluetooth_ops = {
+IODev_ops_t nRF5x_Bluetooth_ops = {
   "nRF52 Bluetooth",
   nRF52_Bluetooth_setup,
   nRF52_Bluetooth_loop,
@@ -666,4 +682,4 @@ IODev_ops_t nRF52_Bluetooth_ops = {
   nRF52_Bluetooth_write
 };
 
-#endif /* ARDUINO_ARCH_NRF52 */
+#endif /* ARDUINO_ARCH_NRF52 || ARDUINO_ARCH_NRF54L15CLEAN */

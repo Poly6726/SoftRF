@@ -127,8 +127,8 @@ static uint32_t bootCount __attribute__ ((section (".noinit")));
 static nRF52_board_id nRF52_board = NRF52_LILYGO_TECHO_REV_2; /* default */
 static nRF52_display_id nRF52_display = EP_UNKNOWN;
 
-const char *nRF52_Device_Manufacturer = SOFTRF_IDENT;
-const char *nRF52_Device_Model = "Badge Edition";
+const char *nRF5x_Device_Manufacturer = SOFTRF_IDENT;
+const char *nRF5x_Device_Model = "Badge Edition";
 const uint16_t nRF52_Device_Version = SOFTRF_USB_FW_VERSION;
 static uint16_t nRF52_USB_VID = 0x239A; /* Adafruit Industries */
 static uint16_t nRF52_USB_PID = 0x8029; /* Feather nRF52840 Express */
@@ -836,7 +836,7 @@ static void nRF52_setup()
     nRF52_board        = NRF52_LILYGO_TULTIMA;
     hw_info.model      = SOFTRF_MODEL_NEO;
     hw_info.pmu        = PMU_SY6970;
-    nRF52_Device_Model = "Neo Edition";
+    nRF5x_Device_Model = "Neo Edition";
 
     // Set the minimum operating voltage. Below this voltage, the PMU will protect
     sy6970.setSysPowerDownVoltage(3300);
@@ -908,7 +908,7 @@ static void nRF52_setup()
     if (nRF52_has_imu) {
       nRF52_board        = NRF52_SEEED_T1000E;
       hw_info.model      = SOFTRF_MODEL_CARD;
-      nRF52_Device_Model = "Card Edition";
+      nRF5x_Device_Model = "Card Edition";
       nRF52_USB_VID      = 0x2886; /* Seeed Technology */
       nRF52_USB_PID      = 0x0057; /* SenseCAP T1000-E */
 
@@ -944,7 +944,7 @@ static void nRF52_setup()
     if (Wire.endTransmission() == 0) {
       nRF52_board        = NRF52_ELECROW_TN_M3;
       hw_info.model      = SOFTRF_MODEL_POCKET;
-      nRF52_Device_Model = "Pocket Edition";
+      nRF5x_Device_Model = "Pocket Edition";
     }
     Wire.end();
     pinMode(SOC_GPIO_PIN_M3_TEMP_EN,    INPUT);
@@ -965,7 +965,7 @@ static void nRF52_setup()
 
   if (nRF52_board == NRF52_ELECROW_TN_M6) { /* "ThinkNodeM6" */
     hw_info.model      = SOFTRF_MODEL_SOLARIS;
-    nRF52_Device_Model = "Solaris Edition";
+    nRF5x_Device_Model = "Solaris Edition";
 
     if (reset_reason & POWER_RESETREAS_VBUS_Msk ||
         reset_reason & POWER_RESETREAS_RESETPIN_Msk) {
@@ -1170,7 +1170,7 @@ static void nRF52_setup()
        (buzzer_high_impedance == LOW && buzzer_pullup == LOW)) {
       nRF52_board        = NRF52_ELECROW_TN_M1;
       hw_info.model      = SOFTRF_MODEL_HANDHELD;
-      nRF52_Device_Model = "Handheld Edition";
+      nRF5x_Device_Model = "Handheld Edition";
 
       if (reset_reason & POWER_RESETREAS_VBUS_Msk) {
         NRF_POWER->GPREGRET = DFU_MAGIC_SKIP;
@@ -1193,7 +1193,7 @@ static void nRF52_setup()
       nRF52_has_rtc      == false)) {
     nRF52_board        = NRF52_HELTEC_T114;
     hw_info.model      = SOFTRF_MODEL_COZY;
-    nRF52_Device_Model = "Cozy Edition";
+    nRF5x_Device_Model = "Cozy Edition";
 
     if (reset_reason & POWER_RESETREAS_VBUS_Msk) {
       NRF_POWER->GPREGRET = DFU_MAGIC_SKIP;
@@ -1213,7 +1213,7 @@ static void nRF52_setup()
 #if defined(USE_OLED)
   if (nRF52_board == NRF52_SEEED_WIO_L1) {
     hw_info.model      = SOFTRF_MODEL_DECENT;
-    nRF52_Device_Model = "Decent Edition";
+    nRF5x_Device_Model = "Decent Edition";
     nRF52_USB_VID      = 0x2886; /* Seeed Technology */
     nRF52_USB_PID      = 0x1668; /* Wio Tracker L1 */
 
@@ -1231,7 +1231,7 @@ static void nRF52_setup()
 #if !defined(EXCLUDE_WIP)
   if (nRF52_board == NRF52_SEEED_T2000) {
     hw_info.model      = SOFTRF_MODEL_RUGGED;
-    nRF52_Device_Model = "Rugged Edition";
+    nRF5x_Device_Model = "Rugged Edition";
     nRF52_USB_VID      = 0x2886; /* Seeed Technology */
     nRF52_USB_PID      = 0x1668; /* TBD */
 
@@ -1248,8 +1248,8 @@ static void nRF52_setup()
 
 #if !defined(ARDUINO_ARCH_MBED) && !defined(ARDUINO_ARCH_ZEPHYR)
   USBDevice.setID(nRF52_USB_VID, nRF52_USB_PID);
-  USBDevice.setManufacturerDescriptor(nRF52_Device_Manufacturer);
-  USBDevice.setProductDescriptor(nRF52_Device_Model);
+  USBDevice.setManufacturerDescriptor(nRF5x_Device_Manufacturer);
+  USBDevice.setProductDescriptor(nRF5x_Device_Model);
   USBDevice.setDeviceVersion(nRF52_Device_Version);
 #endif /* ARDUINO_ARCH_MBED */
 
@@ -1833,7 +1833,7 @@ static void nRF52_setup()
     //HWFlashTransport.setClockSpeed(wr_speed, rd_speed);
 
     // Set disk vendor id, product id and revision with string up to 8, 16, 4 characters respectively
-    usb_msc.setID(nRF52_Device_Manufacturer, "External Flash", "1.0");
+    usb_msc.setID(nRF5x_Device_Manufacturer, "External Flash", "1.0");
 
     // Set callback
     usb_msc.setReadWriteCallback(nRF52_msc_read_cb,
@@ -4743,7 +4743,7 @@ const SoC_ops_t nRF52_ops = {
 #if defined(USE_ARDUINOBLE)
   &ArdBLE_Bluetooth_ops,
 #else
-  &nRF52_Bluetooth_ops,
+  &nRF5x_Bluetooth_ops,
 #endif /* USE_ARDUINOBLE */
 #else
   NULL,

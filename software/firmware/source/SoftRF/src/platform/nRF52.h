@@ -387,7 +387,7 @@ extern Adafruit_NeoPixel strip;
 extern Uart Serial2;
 #endif
 
-extern const char *nRF52_Device_Manufacturer, *nRF52_Device_Model, *Hardware_Rev[];
+extern const char *nRF5x_Device_Manufacturer, *nRF5x_Device_Model, *Hardware_Rev[];
 
 #if defined(USE_EPAPER)
 typedef void EPD_Task_t;
