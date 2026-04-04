@@ -81,6 +81,7 @@ enum nRF52_board_id {
   NRF52_LILYGO_TECHO_PLUS,      /* 2025 */
   NRF52_LILYGO_TULTIMA,
   NRF52_SEEED_T1000E,
+  NRF52_SEEED_T1000E_PRO,       /* 2026 */
   NRF52_HELTEC_T114,
   NRF52_ELECROW_TN_M1,
   NRF52_ELECROW_TN_M3,
@@ -154,6 +155,7 @@ struct rst_info {
 #include "iomap/LilyGO_TEcho.h"
 #include "iomap/LilyGO_TUltima.h"
 #include "iomap/Seeed_T1000E.h"
+#include "iomap/Seeed_T1000E_PRO.h"
 #include "iomap/Seeed_T2000.h"
 #include "iomap/Seeed_Wio_L1.h"
 #include "iomap/Heltec_T114.h"
@@ -319,7 +321,12 @@ struct rst_info {
 #define USE_TFT
 #define USE_RADIOLIB
 //#define EXCLUDE_LR11XX
+#if defined(USE_RADIOLIB)
+#include <BuildOpt.h>
+#if RADIOLIB_VERSION_MAJOR < 7 && RADIOLIB_VERSION_MINOR < 6
 #define EXCLUDE_LR20XX
+#endif /* RADIOLIB_VERSION */
+#endif /* USE_RADIOLIB */
 #define EXCLUDE_CC1101
 #define EXCLUDE_SI443X
 #define EXCLUDE_SI446X

@@ -86,6 +86,18 @@ eeprom_t eeprom_block;
 settings_t *settings = &eeprom_block.field.settings;
 #endif /* EXCLUDE_EEPROM */
 
+#if !defined(EXCLUDE_LED_RING)
+// Parameter 1 = number of pixels in strip
+// Parameter 2 = Arduino pin number (most are valid)
+// Parameter 3 = pixel type flags, add together as needed:
+//   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
+//   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
+//   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
+//   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIX_NUM, SOC_GPIO_PIN_LED,
+                                            NEO_GRB + NEO_KHZ800);
+#endif /* EXCLUDE_LED_RING */
+
 #if defined(EXCLUDE_WIFI)
 char UDPpacketBuffer[256]; // Dummy definition to satisfy build sequence
 #endif /* EXCLUDE_WIFI */

@@ -94,6 +94,8 @@ struct rst_info {
 
 #define SOC_GPIO_LED_BLE      SOC_UNUSED_PIN
 
+#define SOC_GPIO_PIN_LED      SOC_UNUSED_PIN
+
 //#define EXCLUDE_EEPROM
 #define EXCLUDE_WIFI
 #define EXCLUDE_ETHERNET
@@ -125,7 +127,7 @@ struct rst_info {
 //#define EXCLUDE_MAVLINK        //  -    kb
 #define EXCLUDE_UATM             //  -    kb
 #define EXCLUDE_EGM96            //  - 16 kb
-#define EXCLUDE_LED_RING         //  -    kb
+//#define EXCLUDE_LED_RING       //  -    kb
 #define USE_OLED                 //  +  6 kb
 
 #define USE_BASICMAC
@@ -148,7 +150,12 @@ struct rst_info {
 
 #define USE_RADIOLIB
 //#define EXCLUDE_LR11XX
+#if defined(USE_RADIOLIB)
+#include <BuildOpt.h>
+#if RADIOLIB_VERSION_MAJOR < 7 && RADIOLIB_VERSION_MINOR < 6
 #define EXCLUDE_LR20XX
+#endif /* RADIOLIB_VERSION */
+#endif /* USE_RADIOLIB */
 #define EXCLUDE_CC1101
 #define EXCLUDE_SI443X
 #define EXCLUDE_SI446X
@@ -170,6 +177,12 @@ struct rst_info {
 #else
 #define SOC_GPIO_PIN_BUZZER   SOC_UNUSED_PIN
 #endif /* USE_PWM_SOUND */
+
+#if !defined(EXCLUDE_LED_RING)
+#include <Adafruit_NeoPixel.h>
+
+extern Adafruit_NeoPixel strip;
+#endif /* EXCLUDE_LED_RING */
 
 #if defined(USE_OLED)
 #define U8X8_OLED_I2C_BUS_TYPE  U8X8_SSD1306_128X64_NONAME_HW_I2C

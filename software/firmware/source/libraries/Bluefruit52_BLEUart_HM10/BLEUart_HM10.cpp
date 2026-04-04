@@ -129,7 +129,7 @@ void BLEUart_HM10::bleuart_txd_cccd_cb(uint16_t conn_hdl, BLECharacteristic* chr
   if ( svc._notify_cb ) svc._notify_cb(conn_hdl, value & BLE_GATT_HVX_NOTIFICATION);
 #endif /* ARDUINO_ARCH_NRF52 */
 #if defined(ARDUINO_ARCH_NRF54L15CLEAN)
-  /* TBD */
+  if ( svc._notify_cb ) svc._notify_cb(conn_hdl, value); /* TODD */
 #endif /* ARDUINO_ARCH_NRF54L15CLEAN */
 }
 

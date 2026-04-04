@@ -4831,6 +4831,22 @@ static const Module::RfSwitchMode_t rfswitch_table_MXD8721[] = {
     LR2021::MODE_END_OF_TABLE,
 };
 
+static const uint32_t rfswitch_dio_pins_seeed_pro[] = {
+    RADIOLIB_NC, RADIOLIB_NC,
+    RADIOLIB_NC, RADIOLIB_NC,
+    RADIOLIB_NC
+};
+
+static const Module::RfSwitchMode_t rfswitch_table_seeed_pro[] = {
+    // mode
+    { LR2021::MODE_STBY,   { } },
+    { LR2021::MODE_RX,     { } },
+    { LR2021::MODE_TX,     { } },
+    { LR2021::MODE_RX_HF,  { } },
+    { LR2021::MODE_TX_HF,  { } },
+    LR2021::MODE_END_OF_TABLE,
+};
+
 // this function is called when a complete packet
 // is received by the module
 // IMPORTANT: this function MUST be 'void' type
@@ -5053,6 +5069,10 @@ static void lr20xx_setup()
   case SOFTRF_MODEL_ACADEMY:
     radio_g4->irqDioNum = 8; /* DIO8 as IRQ on WIO-2021 */
     Vtcxo = 0.0; /* XTAL */
+    break;
+  case SOFTRF_MODEL_CARD:
+    radio_g4->irqDioNum = 8; /* DIO8 as IRQ on T1000-E PRO */
+    Vtcxo = 1.6;
     break;
   default:
     radio_g4->irqDioNum = 11; /* LR2021 DIO11 as IRQ */
@@ -5463,10 +5483,16 @@ static void lr20xx_setup()
 
   switch (hw_info.model)
   {
+  case SOFTRF_MODEL_CARD:
+    radio_g4->setRfSwitchTable(rfswitch_dio_pins_seeed_pro,
+                               rfswitch_table_seeed_pro);
+    rl_state = radio_g4->setOutputPower(txpow);
+    break;
   case SOFTRF_MODEL_BADGE:
   case SOFTRF_MODEL_PRIME_MK3:
   default:
-    radio_g4->setRfSwitchTable(rfswitch_dio_pins_MXD8721, rfswitch_table_MXD8721);
+    radio_g4->setRfSwitchTable(rfswitch_dio_pins_MXD8721,
+                               rfswitch_table_MXD8721);
     rl_state = radio_g4->setOutputPower(txpow);
     break;
   }

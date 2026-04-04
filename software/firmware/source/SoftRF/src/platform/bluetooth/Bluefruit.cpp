@@ -447,7 +447,7 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
 #endif
 }
 
-void nRF52_Bluetooth_setup()
+void nRF5x_Bluetooth_setup()
 {
   char id_06x[8];
   snprintf(id_06x, sizeof(id_06x),"%06x", SoC->getChipId() & 0x00FFFFFFU);
@@ -536,7 +536,7 @@ void nRF52_Bluetooth_setup()
  End of Adafruit licensed text
 *********************************************************************/
 
-static void nRF52_Bluetooth_loop()
+static void nRF5x_Bluetooth_loop()
 {
   // notify changed value
   // bluetooth stack will go into congestion, if too many packets are sent
@@ -575,7 +575,7 @@ static void nRF52_Bluetooth_loop()
 #endif /* ENABLE_REMOTE_ID */
 }
 
-static void nRF52_Bluetooth_fini()
+static void nRF5x_Bluetooth_fini()
 {
   uint8_t sd_en = 0;
 
@@ -606,7 +606,7 @@ static void nRF52_Bluetooth_fini()
 #endif /* ARDUINO_ARCH_NRF52 */
 }
 
-static int nRF52_Bluetooth_available()
+static int nRF5x_Bluetooth_available()
 {
   int rval = 0;
 
@@ -628,7 +628,7 @@ static int nRF52_Bluetooth_available()
   return rval;
 }
 
-static int nRF52_Bluetooth_read()
+static int nRF5x_Bluetooth_read()
 {
   int rval = -1;
 
@@ -650,7 +650,7 @@ static int nRF52_Bluetooth_read()
   return rval;
 }
 
-static size_t nRF52_Bluetooth_write(const uint8_t *buffer, size_t size)
+static size_t nRF5x_Bluetooth_write(const uint8_t *buffer, size_t size)
 {
   size_t rval = size;
 
@@ -673,13 +673,13 @@ static size_t nRF52_Bluetooth_write(const uint8_t *buffer, size_t size)
 }
 
 IODev_ops_t nRF5x_Bluetooth_ops = {
-  "nRF52 Bluetooth",
-  nRF52_Bluetooth_setup,
-  nRF52_Bluetooth_loop,
-  nRF52_Bluetooth_fini,
-  nRF52_Bluetooth_available,
-  nRF52_Bluetooth_read,
-  nRF52_Bluetooth_write
+  "nRF5x Bluetooth",
+  nRF5x_Bluetooth_setup,
+  nRF5x_Bluetooth_loop,
+  nRF5x_Bluetooth_fini,
+  nRF5x_Bluetooth_available,
+  nRF5x_Bluetooth_read,
+  nRF5x_Bluetooth_write
 };
 
 #endif /* ARDUINO_ARCH_NRF52 || ARDUINO_ARCH_NRF54L15CLEAN */
