@@ -323,7 +323,7 @@ struct rst_info {
 //#define EXCLUDE_LR11XX
 #if defined(USE_RADIOLIB)
 #include <BuildOpt.h>
-#if RADIOLIB_VERSION_MAJOR < 7 && RADIOLIB_VERSION_MINOR < 6
+#if RADIOLIB_VERSION_MAJOR <= 7 && RADIOLIB_VERSION_MINOR < 6
 #define EXCLUDE_LR20XX
 #endif /* RADIOLIB_VERSION */
 #endif /* USE_RADIOLIB */
