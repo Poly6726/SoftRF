@@ -109,6 +109,12 @@ SoftSPI RadioSPI(SOC_GPIO_PIN_EVK_MOSI,
                  SOC_GPIO_PIN_EVK_SCK);
 #endif /* USE_SOFTSPI */
 
+#if defined(USE_RTT)
+#include <RTTStream.h>
+
+RTTStream RTTSerial;
+#endif /* USE_RTT */
+
 char *dtostrf_workaround(double number, signed char width, unsigned char prec, char *s) {
     bool negative = false;
 
@@ -287,7 +293,9 @@ static void nRF54_setup()
   switch (nRF54_board)
   {
     case NRF54_MX25LE02:
+#if !defined(USE_RTT)
       Serial.setPins(SOC_GPIO_PIN_CONS_MX25_RX, SOC_GPIO_PIN_CONS_MX25_TX);
+#endif /* USE_RTT */
       Wire.setPins(SOC_GPIO_PIN_MX25_SDA, SOC_GPIO_PIN_MX25_SCL);
 
       lmic_pins.nss  = SOC_GPIO_PIN_MX25_SS;
@@ -309,7 +317,9 @@ static void nRF54_setup()
 
     case NRF54_LR2021EVK1XCS1:
     default:
+#if !defined(USE_RTT)
       Serial.setPins(SOC_GPIO_PIN_CONS_EVK_RX, SOC_GPIO_PIN_CONS_EVK_TX);
+#endif /* USE_RTT */
 
       lmic_pins.nss  = SOC_GPIO_PIN_EVK_SS;
       lmic_pins.rst  = SOC_GPIO_PIN_EVK_RST;
@@ -339,7 +349,9 @@ static void nRF54_setup()
       break;
   }
 
+#if !defined(USE_RTT)
   Serial.begin(SERIAL_OUT_BR, SERIAL_OUT_BITS);
+#endif /* USE_RTT */
 }
 
 static void nRF54_post_init()
@@ -545,7 +557,10 @@ static void nRF54_fini(int reason)
   Serial.println("Entering SYSTEM OFF. Wake by pressing USER button.");
   Serial.flush();
   delay(2);
+
+#if !defined(USE_RTT)
   Serial.end();
+#endif /* USE_RTT */
 
   g_powerManager.systemOffNoRetention();
 #endif

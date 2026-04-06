@@ -165,6 +165,8 @@ struct rst_info {
 //#define EXCLUDE_BLUETOOTH
 #define EXCLUDE_BHI260
 
+//#define USE_RTT
+
 /* FTD-012 data port protocol version 8 and 9 */
 #define PFLAA_EXT1_FMT  ",%d,%d,%d"
 #define PFLAA_EXT1_ARGS ,Container[i].no_track,data_source,Container[i].rssi
@@ -187,6 +189,14 @@ extern Adafruit_NeoPixel strip;
 #if defined(USE_OLED)
 #define U8X8_OLED_I2C_BUS_TYPE  U8X8_SSD1306_128X64_NONAME_HW_I2C
 #endif /* USE_OLED */
+
+#if defined(USE_RTT)
+#include <RTTStream.h>
+extern RTTStream RTTSerial;
+
+#undef Serial
+#define Serial                RTTSerial
+#endif /* USE_RTT */
 
 extern const char *nRF5x_Device_Manufacturer, *nRF5x_Device_Model, *Hardware_Rev[];
 
