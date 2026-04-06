@@ -155,7 +155,7 @@ struct rst_info {
 #include "iomap/LilyGO_TEcho.h"
 #include "iomap/LilyGO_TUltima.h"
 #include "iomap/Seeed_T1000E.h"
-#include "iomap/Seeed_T1000E_PRO.h"
+#include "iomap/Seeed_T1000E_Pro.h"
 #include "iomap/Seeed_T2000.h"
 #include "iomap/Seeed_Wio_L1.h"
 #include "iomap/Heltec_T114.h"
