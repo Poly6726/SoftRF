@@ -151,8 +151,10 @@ void EEPROM_defaults()
                                            hw_info.model == SOFTRF_MODEL_GIZMO    ||
                                            hw_info.model == SOFTRF_MODEL_AIRVENTURE ?
                                            NMEA_UART : NMEA_USB;
-#elif defined(ARDUINO_ARCH_SILABS) || defined(ARDUINO_ARCH_NRF54L15CLEAN)
+#elif defined(ARDUINO_ARCH_SILABS)
   eeprom_block.field.settings.nmea_out   = NMEA_UART;
+#elif defined(ARDUINO_ARCH_NRF54L15CLEAN)
+  eeprom_block.field.settings.nmea_out   = NMEA_BLUETOOTH;
 #else
   eeprom_block.field.settings.nmea_out   = hw_info.model == SOFTRF_MODEL_BADGE    ||
                                            hw_info.model == SOFTRF_MODEL_CARD     ||
