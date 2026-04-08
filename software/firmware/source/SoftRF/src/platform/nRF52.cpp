@@ -931,6 +931,39 @@ static void nRF52_setup()
       // pinMode(SOC_GPIO_LED_T1000_RED, OUTPUT);
     }
 #endif /* EXCLUDE_IMU */
+
+    pinMode(SOC_GPIO_PIN_T1KEP_HAPTIC_EN, INPUT_PULLUP);
+    delay(5);
+
+#if !defined(ARDUINO_ARCH_MBED) && !defined(ARDUINO_ARCH_ZEPHYR)
+    Wire.setPins(SOC_GPIO_PIN_T1KEP_SDA, SOC_GPIO_PIN_T1KEP_SCL);
+#endif /* ARDUINO_ARCH_MBED */
+    Wire.begin();
+    Wire.beginTransmission(DRV2605_ADDRESS);
+    nRF52_has_vibra = (Wire.endTransmission() == 0);
+    Wire.end();
+    pinMode(SOC_GPIO_PIN_T1KEP_HAPTIC_EN, INPUT);
+
+    if (nRF52_has_vibra) {
+      nRF52_board        = NRF52_SEEED_T1000E_PRO;
+      hw_info.model      = SOFTRF_MODEL_CARD;
+      nRF5x_Device_Model = "Card Edition";
+      nRF52_USB_VID      = 0x2886; /* Seeed Technology */
+      nRF52_USB_PID      = 0x0057; /* SenseCAP T1000-E */
+
+      if (reset_reason & POWER_RESETREAS_VBUS_Msk ||
+          reset_reason & POWER_RESETREAS_RESETPIN_Msk) {
+        NRF_POWER->GPREGRET = DFU_MAGIC_SKIP;
+        pinMode(SOC_GPIO_PIN_IO_PWR, INPUT);
+#if !defined(ARDUINO_ARCH_MBED) && !defined(ARDUINO_ARCH_ZEPHYR)
+        pinMode(SOC_GPIO_PIN_T1KEP_BUTTON, INPUT_PULLDOWN_SENSE /* INPUT_SENSE_HIGH */);
+#endif /* ARDUINO_ARCH_MBED */
+        nRF52_system_off();
+      }
+
+      digitalWrite(SOC_GPIO_PIN_SFL_T1KEP_EN, HIGH);
+      pinMode(SOC_GPIO_PIN_SFL_T1KEP_EN, OUTPUT);
+    }
   }
 
   if (nRF52_board == NRF52_ELECROW_TN_M1 || /* "ELECROWBOOT" */
@@ -2785,6 +2818,8 @@ static void nRF52_fini(int reason)
       pinMode(SOC_GPIO_LED_T1KEP_GREEN,     INPUT);
       digitalWrite(SOC_GPIO_LED_T1KEP_BLUE, 1-LED_STATE_ON);
       pinMode(SOC_GPIO_LED_T1KEP_BLUE,      INPUT);
+
+      pinMode(SOC_GPIO_PIN_SFL_T1KEP_EN,    INPUT);
       break;
 #endif /* EXCLUDE_WIP */
 
@@ -2804,8 +2839,9 @@ static void nRF52_fini(int reason)
       pinMode(SOC_GPIO_PIN_T1000_SS,        INPUT_PULLUP);
 
       digitalWrite(SOC_GPIO_LED_T1000_GREEN, 1-LED_STATE_ON);
-      pinMode(SOC_GPIO_PIN_SFL_T1000_EN,    INPUT);
       pinMode(SOC_GPIO_LED_T1000_GREEN,     INPUT);
+
+      pinMode(SOC_GPIO_PIN_SFL_T1000_EN,    INPUT);
       break;
 
     case NRF52_ELECROW_TN_M1:

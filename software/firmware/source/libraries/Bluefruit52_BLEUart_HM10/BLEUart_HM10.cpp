@@ -162,12 +162,7 @@ err_t BLEUart_HM10::begin(void)
   // Invoke base class begin()
   VERIFY_STATUS( BLEService::begin() );
 
-#if defined(ARDUINO_ARCH_NRF52)
   uint16_t max_mtu = Bluefruit.getMaxMtu(BLE_GAP_ROLE_PERIPH);
-#endif /* ARDUINO_ARCH_NRF52 */
-#if defined(ARDUINO_ARCH_NRF54L15CLEAN)
-  uint16_t max_mtu = 20; /* TBD */
-#endif /* ARDUINO_ARCH_NRF54L15CLEAN */
 
   // Add RXD+TXD Characteristic
   _rtxd.setProperties(CHR_PROPS_READ | CHR_PROPS_NOTIFY | CHR_PROPS_WRITE_WO_RESP);

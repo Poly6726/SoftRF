@@ -68,5 +68,7 @@
 #define SOC_GPIO_PIN_SFL_T1KEP_HOLD   _PINNUM(1,  0) // P1.00
 #define SOC_GPIO_PIN_SFL_T1KEP_WP     _PINNUM(0, 23) // P0.23
 
+#define SOC_GPIO_PIN_SFL_T1KEP_EN     _PINNUM(0, 15) // P0.15 active HIGH
+
 /* misc. */
 #define SOC_GPIO_PIN_T1KEP_MCU_RESET  _PINNUM(0, 18) // P0.18
