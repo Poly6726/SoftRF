@@ -535,6 +535,9 @@ esp_err_t es8311_codec_init(const unsigned int i2c_num) {
 #include <GaugeBQ27220.hpp>
 #include <ICM_20948.h>
 #include <TouchDrvGT911.hpp>
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+#include <HapticDrivers.hpp>
+#endif /* (0, 4, 1) */
 
 #if defined(TDP4_ES8311_IIC) && TDP4_ES8311_IIC == 2
 TwoWire Wire2 = TwoWire(2);
@@ -543,6 +546,11 @@ TwoWire Wire2 = TwoWire(2);
 ExtensionIOXL9555 *xl9535 = nullptr;
 GaugeBQ27220      bq_27220;
 ICM_20948_I2C     imu_icm20948;
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+HapticDriver_AW86224 vibra;
+#endif /* (0, 4, 1) */
+
+static bool ESP32_has_vibra = false;
 
 #include "../driver/GNSS.h"
 #if defined(USE_DSI)
@@ -2625,7 +2633,15 @@ static void ESP32_setup()
     }
     TDP4_IIC_2.beginTransmission(AW86224_ADDRESS);
     if (TDP4_IIC_2.endTransmission() == 0) {
-      hw_info.haptic   = HAPTIC_AW86224;
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+      ESP32_has_vibra = vibra.begin(TDP4_IIC_2, AW8624_SLAVE_ADDRESS,
+                                    SOC_GPIO_PIN_TDP4_SDA_2,
+                                    SOC_GPIO_PIN_TDP4_SCL_2);
+      if (ESP32_has_vibra)
+#endif /* (0, 4, 1) */
+      {
+        hw_info.haptic = HAPTIC_AW86224;
+      }
     }
 
     hw_info.camera = CAMERA_OV2710;
@@ -4009,6 +4025,12 @@ static void ESP32_Sound_test(int var)
 #endif /* USE_BLE_MIDI */
 
 #if defined(CONFIG_IDF_TARGET_ESP32P4)
+  if (esp32_board == ESP32_LILYGO_TDISPLAY_P4 && ESP32_has_vibra == true) {
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+    vibra.playEffect(1);
+#endif /* (0, 4, 1) */
+  }
+
 #if !defined(EXCLUDE_VOICE_MESSAGE)
   if ((esp32_board == ESP32_LILYGO_TDISPLAY_P4 ||
        esp32_board == ESP32_P4_WT_DEVKIT) &&
