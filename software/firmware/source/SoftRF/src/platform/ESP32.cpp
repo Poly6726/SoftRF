@@ -383,10 +383,16 @@ extern int32_t IMU_g_x10;
 
 #if !defined(EXCLUDE_MAG)
 #include <SensorQMC6310.hpp>
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+#include <SensorQMC6309.hpp>
+#endif /* (0, 4, 1) */
 
 #define MAG_UPDATE_INTERVAL 500 /* ms */
 
 SensorQMC6310 mag_qmc6310;
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+SensorQMC6309 mag_qmc6309;
+#endif /* (0, 4, 1) */
 
 static unsigned long MAG_Time_Marker = 0;
 
@@ -1190,23 +1196,80 @@ static void ESP32_setup()
       delay(200);
 
 #if !defined(EXCLUDE_MAG)
-      bool esp32_has_qmc_u = false;
-      bool esp32_has_qmc_n = false;
-      esp32_has_qmc_u = mag_qmc6310.begin(Wire, QMC6310U_SLAVE_ADDRESS,
-                                          SOC_GPIO_PIN_S3_SDA,
-                                          SOC_GPIO_PIN_S3_SCL);
-      if (esp32_has_qmc_u) {
-        hw_info.mag = MAG_QMC6310U;
-      } else {
-        esp32_has_qmc_n = mag_qmc6310.begin(Wire, QMC6310N_SLAVE_ADDRESS,
+      bool esp32_has_qmc10_u = false;
+      bool esp32_has_qmc10_n = false;
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+      bool esp32_has_qmc9    = false;
+#endif /* (0, 4, 1) */
+
+      esp32_has_qmc10_u = mag_qmc6310.begin(Wire, QMC6310U_SLAVE_ADDRESS,
                                             SOC_GPIO_PIN_S3_SDA,
                                             SOC_GPIO_PIN_S3_SCL);
-        if (esp32_has_qmc_n) {
+      if (esp32_has_qmc10_u) {
+        hw_info.mag = MAG_QMC6310U;
+      } else {
+        esp32_has_qmc10_n = mag_qmc6310.begin(Wire, QMC6310N_SLAVE_ADDRESS,
+                                              SOC_GPIO_PIN_S3_SDA,
+                                              SOC_GPIO_PIN_S3_SCL);
+        if (esp32_has_qmc10_n) {
           hw_info.mag = MAG_QMC6310N;
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+        } else {
+          esp32_has_qmc9 = mag_qmc6309.begin(Wire, QMC6309_SLAVE_ADDRESS,
+                                             SOC_GPIO_PIN_S3_SDA,
+                                             SOC_GPIO_PIN_S3_SCL);
+          if (esp32_has_qmc9) {
+            hw_info.mag = MAG_QMC6309;
+          }
+#endif /* (0, 4, 1) */
         }
       }
 
-      if (esp32_has_qmc_u || esp32_has_qmc_n) {
+      if (esp32_has_qmc10_u || esp32_has_qmc10_n) {
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+        mag_qmc6310.configMagnetometer(
+            /*
+            * Run Mode
+            * MODE_SUSPEND
+            * MODE_NORMAL
+            * MODE_SINGLE
+            * MODE_CONTINUOUS
+            * * */
+            OperationMode::NORMAL,
+            /*
+            * Full Range
+            * RANGE_30G
+            * RANGE_12G
+            * RANGE_8G
+            * RANGE_2G
+            * * */
+            MagFullScaleRange::FS_2G,
+            /*
+            * Output data rate
+            * DATARATE_10HZ
+            * DATARATE_50HZ
+            * DATARATE_100HZ
+            * DATARATE_200HZ
+            * * */
+            100.0f,
+            /*
+            * Over sample Ratio1
+            * OSR_8
+            * OSR_4
+            * OSR_2
+            * OSR_1
+            * * * */
+            MagOverSampleRatio::OSR_1,
+
+            /*
+            * Down sample Ratio1
+            * DSR_8
+            * DSR_4
+            * DSR_2
+            * DSR_1
+            * * */
+            MagDownSampleRatio::DSR_1);
+#else
         mag_qmc6310.configMagnetometer(
             /*
             * Run Mode
@@ -1249,6 +1312,52 @@ static void ESP32_setup()
             * DSR_1
             * * */
             SensorQMC6310::DSR_1);
+#endif /* (0, 4, 1) */
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+      } else if (esp32_has_qmc9) {
+        mag_qmc6309.configMagnetometer(
+            /*
+            * Run Mode
+            * MODE_SUSPEND
+            * MODE_NORMAL
+            * MODE_SINGLE
+            * MODE_CONTINUOUS
+            * * */
+            OperationMode::NORMAL,
+            /*
+            * Full Range
+            * RANGE_30G
+            * RANGE_12G
+            * RANGE_8G
+            * RANGE_2G
+            * * */
+            MagFullScaleRange::FS_2G,
+            /*
+            * Output data rate
+            * DATARATE_10HZ
+            * DATARATE_50HZ
+            * DATARATE_100HZ
+            * DATARATE_200HZ
+            * * */
+            100.0f,
+            /*
+            * Over sample Ratio1
+            * OSR_8
+            * OSR_4
+            * OSR_2
+            * OSR_1
+            * * * */
+            MagOverSampleRatio::OSR_1,
+
+            /*
+            * Down sample Ratio1
+            * DSR_8
+            * DSR_4
+            * DSR_2
+            * DSR_1
+            * * */
+            MagDownSampleRatio::DSR_1);
+#endif /* (0, 4, 1) */
       } else {
         WIRE_FINI(Wire);
       }
@@ -3259,11 +3368,21 @@ static void ESP32_loop()
     case MAG_QMC6310U:
     case MAG_QMC6310N:
       if (mag_qmc6310.isDataReady()) {
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+        MagnetometerData data;
+
+        mag_qmc6310.readData(data);
+        // Gauss to ?T
+        float m_x = MagnetometerUtils::gaussToMicroTesla(data.magnetic_field.x);
+        float m_y = MagnetometerUtils::gaussToMicroTesla(data.magnetic_field.y);
+        float m_z = MagnetometerUtils::gaussToMicroTesla(data.magnetic_field.z);
+#else
         mag_qmc6310.readData();
 
         float m_x = mag_qmc6310.getX();
         float m_y = mag_qmc6310.getY();
         float m_z = mag_qmc6310.getZ();
+#endif /* (0, 4, 1) */
         float angle = atan2(-m_z, m_x);
         if (angle < 0) {
           angle += 2 * PI;
@@ -3285,6 +3404,29 @@ static void ESP32_loop()
     #endif
       }
       break;
+
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+    case MAG_QMC6309:
+      if (mag_qmc6309.isDataReady()) {
+        MagnetometerData data;
+
+        mag_qmc6309.readData(data);
+        // Gauss to ?T
+        float m_x = MagnetometerUtils::gaussToMicroTesla(data.magnetic_field.x);
+        float m_y = MagnetometerUtils::gaussToMicroTesla(data.magnetic_field.y);
+        float m_z = MagnetometerUtils::gaussToMicroTesla(data.magnetic_field.z);
+
+        float angle = atan2(-m_z, m_x);
+        if (angle < 0) {
+          angle += 2 * PI;
+        }
+    #if defined(USE_OLED)
+        MAG_heading = (int) (angle * 180 / M_PI);
+    #endif /* USE_OLED */
+      }
+      break;
+#endif /* (0, 4, 1) */
+
     case MAG_NONE:
     default:
       break;
