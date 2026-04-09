@@ -332,7 +332,12 @@ ui_settings_t *ui;
 #include <bosch/BoschSensorDataHelper.hpp>
 
 #if defined(USE_BHI260_RAM_FW)
+#if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
 #include "bosch/firmware/bosch_app30_shuttle_bhi260.h"
+#endif /* (0, 3, 1) */
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
+#include "bosch/firmware/bhi260/bosch_app30_shuttle_bhi260.h"
+#endif /* (0, 4, 0) */
 #endif /* USE_BHI260_RAM_FW */
 #endif /* EXCLUDE_BHI260 */
 
@@ -342,8 +347,13 @@ QMA6100P        imu_3;
 #if !defined(EXCLUDE_BHI260)
 SensorBHI260AP  imu_4;
 
+#if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
 SensorXYZ bhi_accel(SensorBHI260AP::ACCEL_PASSTHROUGH, imu_4);
 // SensorXYZ bhi_gyro(SensorBHI260AP::GYRO_PASSTHROUGH, imu_4);
+#endif /* (0, 3, 1) */
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
+SensorXYZ bhi_accel(BoschSensorID::ACCEL_PASSTHROUGH, imu_4);
+#endif /* (0, 4, 0) */
 #endif /* EXCLUDE_BHI260 */
 
 static bool nRF52_has_imu = false;
@@ -1987,11 +1997,21 @@ static void nRF52_setup()
 #endif /* ENABLE_NFC */
 
   if (nRF52_board == NRF52_LILYGO_TECHO_PLUS) {
+#if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
     nRF52_has_vibra = vibra.begin(Wire);
+#endif /* (0, 3, 1) */
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
+    nRF52_has_vibra = vibra.begin(Wire, DRV2605_SLAVE_ADDRESS);
+#endif /* (0, 4, 0) */
 
     if (nRF52_has_vibra) {
       vibra.selectLibrary(1);
+#if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
       vibra.setMode(SensorDRV2605::MODE_INTTRIG);
+#endif /* (0, 3, 1) */
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
+      vibra.setMode(HapticMode::INTERNAL_TRIGGER);
+#endif /* (0, 4, 0) */
 
       digitalWrite(SOC_GPIO_PIN_MOTOR_EN, HIGH);
       pinMode(SOC_GPIO_PIN_MOTOR_EN, OUTPUT);
@@ -2002,11 +2022,21 @@ static void nRF52_setup()
 
 #if !defined(EXCLUDE_WIP)
   if (nRF52_board == NRF52_SEEED_T1000E_PRO) {
+#if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
     nRF52_has_vibra = vibra.begin(Wire);
+#endif /* (0, 3, 1) */
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
+    nRF52_has_vibra = vibra.begin(Wire, DRV2605_SLAVE_ADDRESS);
+#endif /* (0, 4, 0) */
 
     if (nRF52_has_vibra) {
       vibra.selectLibrary(1);
+#if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
       vibra.setMode(SensorDRV2605::MODE_INTTRIG);
+#endif /* (0, 3, 1) */
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
+      vibra.setMode(HapticMode::INTERNAL_TRIGGER);
+#endif /* (0, 4, 0) */
 
       hw_info.haptic = HAPTIC_DRV2605;
     }
@@ -2747,10 +2777,20 @@ static void nRF52_fini(int reason)
       pinMode(SOC_GPIO_LED_TECHO_REV_2_RED,   INPUT_PULLUP);
       pinMode(SOC_GPIO_LED_TECHO_REV_2_BLUE,  INPUT_PULLUP);
 
-      if (nRF52_board == NRF52_LILYGO_TECHO_PLUS && nRF52_has_vibra == true) {
+      if ((nRF52_board == NRF52_LILYGO_TECHO_PLUS ||
+           nRF52_board == NRF52_SEEED_T1000E_PRO) &&
+           nRF52_has_vibra == true) {
         vibra.stop();
+#if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
         vibra.setMode(1<<6); /* Standby */
-        pinMode(SOC_GPIO_PIN_MOTOR_EN, INPUT);
+#endif /* (0, 3, 1) */
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
+        /* TODO: Standby */
+#endif /* (0, 4, 0) */
+
+        if (nRF52_board == NRF52_LILYGO_TECHO_PLUS) {
+          pinMode(SOC_GPIO_PIN_MOTOR_EN, INPUT);
+        }
       }
 
       pinMode(SOC_GPIO_PIN_SFL_HOLD,  INPUT);
@@ -3211,7 +3251,9 @@ static void nRF52_Sound_test(int var)
   }
 #endif /* USE_USB_MIDI */
 
-  if (nRF52_board == NRF52_LILYGO_TECHO_PLUS && nRF52_has_vibra == true) {
+  if ((nRF52_board == NRF52_LILYGO_TECHO_PLUS ||
+       nRF52_board == NRF52_SEEED_T1000E_PRO) &&
+       nRF52_has_vibra == true) {
     vibra.setWaveform(0, 75); /* Transition Ramp Down Short Smooth 2 - 100 to 0% */
     vibra.setWaveform(1, 0);
     vibra.run();
