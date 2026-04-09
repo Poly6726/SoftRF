@@ -932,6 +932,7 @@ static void nRF52_setup()
     }
 #endif /* EXCLUDE_IMU */
 
+#if !defined(EXCLUDE_WIP)
     pinMode(SOC_GPIO_PIN_T1KEP_HAPTIC_EN, INPUT_PULLUP);
     delay(5);
 
@@ -963,7 +964,12 @@ static void nRF52_setup()
 
       digitalWrite(SOC_GPIO_PIN_SFL_T1KEP_EN, HIGH);
       pinMode(SOC_GPIO_PIN_SFL_T1KEP_EN, OUTPUT);
+      digitalWrite(SOC_GPIO_PIN_T1KEP_HAPTIC_EN, HIGH);
+      pinMode(SOC_GPIO_PIN_T1KEP_HAPTIC_EN, OUTPUT);
+      digitalWrite(SOC_GPIO_PIN_T1KEP_RTC_EN, HIGH);
+      pinMode(SOC_GPIO_PIN_T1KEP_RTC_EN, OUTPUT);
     }
+#endif /* EXCLUDE_WIP */
   }
 
   if (nRF52_board == NRF52_ELECROW_TN_M1 || /* "ELECROWBOOT" */
@@ -1993,6 +1999,19 @@ static void nRF52_setup()
     }
     hw_info.audio = AUDIO_PWM;
   }
+
+#if !defined(EXCLUDE_WIP)
+  if (nRF52_board == NRF52_SEEED_T1000E_PRO) {
+    nRF52_has_vibra = vibra.begin(Wire);
+
+    if (nRF52_has_vibra) {
+      vibra.selectLibrary(1);
+      vibra.setMode(SensorDRV2605::MODE_INTTRIG);
+
+      hw_info.haptic = HAPTIC_DRV2605;
+    }
+  }
+#endif /* EXCLUDE_WIP */
 }
 
 static void nRF52_post_init()
@@ -2191,7 +2210,8 @@ static void nRF52_post_init()
     Serial.println();
     Serial.flush();
 
-  } else if (nRF52_board == NRF52_SEEED_T1000E) {
+  } else if (nRF52_board == NRF52_SEEED_T1000E ||
+             nRF52_board == NRF52_SEEED_T1000E_PRO) {
 #if 0
     Serial.println();
     Serial.print  (F("SPI FLASH JEDEC ID: "));
@@ -2206,7 +2226,8 @@ static void nRF52_post_init()
     Serial.println(F("Built-in components:"));
 
     Serial.print(F("RADIO   : "));
-    Serial.println(hw_info.rf    == RF_IC_LR1110     ? F("PASS") : F("FAIL"));
+    Serial.println(hw_info.rf    == RF_IC_LR1110 ||
+                   hw_info.rf    == RF_IC_LR2021     ? F("PASS") : F("FAIL"));
     Serial.flush();
     Serial.print(F("GNSS    : "));
     Serial.println(hw_info.gnss  == GNSS_MODULE_AG33 ? F("PASS") : F("FAIL"));
@@ -2215,28 +2236,30 @@ static void nRF52_post_init()
     Serial.println(hw_info.storage == STORAGE_FLASH  ? F("PASS") : F("FAIL"));
     Serial.flush();
 
+    if (nRF52_board == NRF52_SEEED_T1000E) {
 #if !defined(EXCLUDE_IMU)
-    Serial.print(F("IMU     : "));
-    Serial.println(hw_info.imu   == ACC_QMA6100P     ? F("PASS") : F("FAIL"));
-    Serial.flush();
+      Serial.print(F("IMU     : "));
+      Serial.println(hw_info.imu   == ACC_QMA6100P   ? F("PASS") : F("FAIL"));
+      Serial.flush();
 #endif /* EXCLUDE_IMU */
 
 #if !defined(ARDUINO_ARCH_MBED) && !defined(ARDUINO_ARCH_ZEPHYR)
-    analogReference(AR_INTERNAL_3_0);
-    analogReadResolution(10);
-    delay(1);
+      analogReference(AR_INTERNAL_3_0);
+      analogReadResolution(10);
+      delay(1);
 
-    Serial.print(F("TEMP    : "));
-    Serial.print((float) t1000e_ntc_sample() / 10.0f);
-    Serial.println(F(" Celsius"));
-    Serial.print(F("LIGHT   : "));
-    Serial.print(t1000e_lux_sample());
-    Serial.println(F(" %"));
-    Serial.print(F("BATTERY : "));
-    Serial.print(t1000e_bat_sample());
-    Serial.println(F(" %"));
-    Serial.flush();
+      Serial.print(F("TEMP    : "));
+      Serial.print((float) t1000e_ntc_sample() / 10.0f);
+      Serial.println(F(" Celsius"));
+      Serial.print(F("LIGHT   : "));
+      Serial.print(t1000e_lux_sample());
+      Serial.println(F(" %"));
+      Serial.print(F("BATTERY : "));
+      Serial.print(t1000e_bat_sample());
+      Serial.println(F(" %"));
+      Serial.flush();
 #endif /* !MBED && !ZEPHYR */
+    }
 
     Serial.println();
     Serial.println(F("Power-on Self Test is complete."));
@@ -2593,6 +2616,7 @@ static void nRF52_loop()
 #endif /* EXCLUDE_IMU */
 
   if ((nRF52_board     == NRF52_SEEED_T1000E      ||
+       nRF52_board     == NRF52_SEEED_T1000E_PRO  ||
        nRF52_board     == NRF52_ELECROW_TN_M1     ||
        nRF52_board     == NRF52_ELECROW_TN_M3     ||
        nRF52_board     == NRF52_LILYGO_TECHO_PLUS ||
@@ -2820,6 +2844,8 @@ static void nRF52_fini(int reason)
       pinMode(SOC_GPIO_LED_T1KEP_BLUE,      INPUT);
 
       pinMode(SOC_GPIO_PIN_SFL_T1KEP_EN,    INPUT);
+      pinMode(SOC_GPIO_PIN_T1KEP_HAPTIC_EN, INPUT);
+      pinMode(SOC_GPIO_PIN_T1KEP_RTC_EN,    INPUT);
       break;
 #endif /* EXCLUDE_WIP */
 
@@ -2940,7 +2966,8 @@ static void nRF52_fini(int reason)
   // pinMode(SOC_GPIO_PIN_SCK,  INPUT);
 
   /* TBD */
-  if (nRF52_board != NRF52_SEEED_T1000E &&
+  if (nRF52_board != NRF52_SEEED_T1000E     &&
+      nRF52_board != NRF52_SEEED_T1000E_PRO &&
       nRF52_board != NRF52_ELECROW_TN_M3) {
     pinMode(SOC_GPIO_PIN_SS, INPUT_PULLUP);
   }
@@ -3000,9 +3027,12 @@ static void nRF52_fini(int reason)
   // pinMode(SOC_GPIO_PIN_PAD,    INPUT);
   pinMode(mode_button_pin, nRF52_board == NRF52_LILYGO_TECHO_REV_1 ? INPUT_PULLUP   :
                            nRF52_board == NRF52_SEEED_T1000E       ? INPUT_PULLDOWN :
+                           nRF52_board == NRF52_SEEED_T1000E_PRO   ? INPUT_PULLDOWN :
                            nRF52_board == NRF52_ELECROW_TN_M6      ? INPUT_PULLUP   :
                            INPUT);
-  while (digitalRead(mode_button_pin) == (nRF52_board == NRF52_SEEED_T1000E ? HIGH : LOW));
+  while (digitalRead(mode_button_pin) == (nRF52_board == NRF52_SEEED_T1000E ||
+                                          nRF52_board == NRF52_SEEED_T1000E_PRO ?
+                                          HIGH : LOW));
   delay(100);
 
 #if defined(USE_TINYUSB)
@@ -3019,7 +3049,8 @@ static void nRF52_fini(int reason)
   case SOFTRF_SHUTDOWN_LOWBAT:
     NRF_POWER->GPREGRET = DFU_MAGIC_SKIP;
 #if !defined(ARDUINO_ARCH_MBED) && !defined(ARDUINO_ARCH_ZEPHYR)
-    pinMode(mode_button_pin, nRF52_board == NRF52_SEEED_T1000E ?
+    pinMode(mode_button_pin, nRF52_board == NRF52_SEEED_T1000E ||
+                             nRF52_board == NRF52_SEEED_T1000E_PRO ?
                              INPUT_PULLDOWN_SENSE /* INPUT_SENSE_HIGH */ :
                              INPUT_PULLUP_SENSE   /* INPUT_SENSE_LOW  */);
 #endif /* ARDUINO_ARCH_MBED */
@@ -3536,7 +3567,8 @@ static void nRF52_swSer_begin(unsigned long baud)
 
   Serial_GNSS_In.begin(baud);
 
-  if (nRF52_board == NRF52_SEEED_T1000E)
+  if (nRF52_board == NRF52_SEEED_T1000E ||
+      nRF52_board == NRF52_SEEED_T1000E_PRO)
   {
     for (int i=0; i<25; i++) {
       /* Enable Sleep mode locking */
@@ -4246,6 +4278,7 @@ static float nRF52_Battery_param(uint8_t param)
       switch (nRF52_board)
       {
         case NRF52_SEEED_T1000E:
+        case NRF52_SEEED_T1000E_PRO:
           bat_adc_pin = SOC_GPIO_PIN_T1000_BATTERY;
           mult        = SOC_ADC_T1000_VOLTAGE_DIV;
           break;
@@ -4319,7 +4352,8 @@ static unsigned long nRF52_get_PPS_TimeMarker() {
 }
 
 static bool nRF52_Baro_setup() {
-  return nRF52_board == NRF52_SEEED_T1000E ||
+  return nRF52_board == NRF52_SEEED_T1000E     ||
+         nRF52_board == NRF52_SEEED_T1000E_PRO ||
          nRF52_board == NRF52_ELECROW_TN_M3 ?
          false : true;
 }
@@ -4500,11 +4534,14 @@ static void nRF52_Button_setup()
   // Button(s) uses external pull up resistor.
   pinMode(mode_button_pin, nRF52_board == NRF52_LILYGO_TECHO_REV_1 ? INPUT_PULLUP   :
                            nRF52_board == NRF52_SEEED_T1000E       ? INPUT_PULLDOWN :
+                           nRF52_board == NRF52_SEEED_T1000E_PRO   ? INPUT_PULLDOWN :
                            nRF52_board == NRF52_ELECROW_TN_M6      ? INPUT_PULLUP   :
                            INPUT);
   if (up_button_pin >= 0) { pinMode(up_button_pin, INPUT); }
 
-  button_1.init(mode_button_pin, nRF52_board == NRF52_SEEED_T1000E ? LOW : HIGH);
+  button_1.init(mode_button_pin, nRF52_board == NRF52_SEEED_T1000E ||
+                                 nRF52_board == NRF52_SEEED_T1000E_PRO ?
+                                 LOW : HIGH);
   if (up_button_pin >= 0) { button_2.init(up_button_pin); }
 
   // Configure the ButtonConfig with the event handler, and enable all higher
