@@ -2785,7 +2785,7 @@ static void nRF52_fini(int reason)
         vibra.setMode(1<<6); /* Standby */
 #endif /* (0, 3, 1) */
 #if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
-        /* TODO: Standby */
+        vibra.setMode(HapticMode::STANDBY);
 #endif /* (0, 4, 0) */
 
         if (nRF52_board == NRF52_LILYGO_TECHO_PLUS) {
