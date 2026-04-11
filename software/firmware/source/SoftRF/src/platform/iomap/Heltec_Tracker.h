@@ -4,7 +4,7 @@
 #define SOC_GPIO_PIN_HELTRK_GNSS_TX     34
 #define SOC_GPIO_PIN_HELTRK_GNSS_RST    35
 #define SOC_GPIO_PIN_HELTRK_GNSS_PPS    36
-#define SOC_GPIO_PIN_HELTRK_GNSS_EN     37 /* V1.x PCB only, active LOW */
+#define SOC_GPIO_PIN_HELTRK_GNSS_EN     37 /* V0.3 only, active LOW */
 
 // SX1262
 #define SOC_GPIO_PIN_HELTRK_MOSI        10
@@ -14,10 +14,10 @@
 #define SOC_GPIO_PIN_HELTRK_RST         12
 #define SOC_GPIO_PIN_HELTRK_BUSY        13
 #define SOC_GPIO_PIN_HELTRK_DIO1        14
-// V2.3 PCB only, KCT8103L
+// V2.3 PCB only, KCT8103L Sub-1GHz FEM
 #define SOC_GPIO_PIN_HELTRK_PA_CSD      4
 #define SOC_GPIO_PIN_HELTRK_PA_CTX      5
-#define SOC_GPIO_PIN_HELTRK_VFEM_Ctrl   7
+#define SOC_GPIO_PIN_HELTRK_VFEM_EN     7
 
 // TFT
 #define SOC_GPIO_PIN_HELTRK_TFT_MOSI    42
@@ -28,7 +28,7 @@
 #define SOC_GPIO_PIN_HELTRK_TFT_RST     39
 #define SOC_GPIO_PIN_HELTRK_TFT_BL_V03  45 /* V1.0 PCB marking */
 #define SOC_GPIO_PIN_HELTRK_TFT_BL_V05  21 /* V1.1 PCB marking */
-#define SOC_GPIO_PIN_HELTRK_TFT_EN      46 /* V1.x PCB only, active LOW */
+#define SOC_GPIO_PIN_HELTRK_TFT_EN      46 /* V0.3 only, active LOW */
 
 // 1st I2C bus
 #define SOC_GPIO_PIN_HELTRK_SDA         6

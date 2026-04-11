@@ -2437,18 +2437,56 @@ static void ESP32_setup()
 
     hw_info.revision = ESP32_has_32k_xtal ? 5 : 3;
 
-    if (hw_info.revision > 3) {
-      digitalWrite(SOC_GPIO_PIN_HELTRK_VEXT_EN, HIGH);
-    } else {
-      digitalWrite(SOC_GPIO_PIN_HELTRK_GNSS_EN, LOW);
-      digitalWrite(SOC_GPIO_PIN_HELTRK_TFT_EN,  LOW);
-      digitalWrite(SOC_GPIO_PIN_HELTRK_VEXT_EN, LOW);
+    bool ESP32_has_SubGHzFE = false;
 
-      pinMode(SOC_GPIO_PIN_HELTRK_GNSS_EN, INPUT_PULLDOWN);
-      delay(300);
-      pinMode(SOC_GPIO_PIN_HELTRK_GNSS_EN, OUTPUT);
-      pinMode(SOC_GPIO_PIN_HELTRK_TFT_EN,  OUTPUT);
+    if (ESP32_has_32k_xtal) {
+      pinMode(SOC_GPIO_PIN_HELTRK_VFEM_EN, INPUT_PULLDOWN);
+      pinMode(SOC_GPIO_PIN_HELTRK_PA_CSD,  INPUT_PULLUP);
+      pinMode(SOC_GPIO_PIN_HELTRK_PA_CTX,  INPUT_PULLUP);
+
+      delay(1);
+
+      if (digitalRead(SOC_GPIO_PIN_HELTRK_PA_CSD) == LOW &&
+          digitalRead(SOC_GPIO_PIN_HELTRK_PA_CTX) == LOW) {
+        ESP32_has_SubGHzFE = true;
+        hw_info.revision = 23; /* V2.3 PCB marking */
+      }
+
+      pinMode(SOC_GPIO_PIN_HELTRK_PA_CSD,  INPUT);
+      pinMode(SOC_GPIO_PIN_HELTRK_PA_CTX,  INPUT);
+      pinMode(SOC_GPIO_PIN_HELTRK_VFEM_EN, INPUT);
     }
+
+    switch (hw_info.revision) {
+      case 3:
+        digitalWrite(SOC_GPIO_PIN_HELTRK_GNSS_EN, LOW);
+        digitalWrite(SOC_GPIO_PIN_HELTRK_TFT_EN,  LOW);
+        digitalWrite(SOC_GPIO_PIN_HELTRK_VEXT_EN, LOW);
+
+        pinMode(SOC_GPIO_PIN_HELTRK_GNSS_EN, INPUT_PULLDOWN);
+        delay(300);
+        pinMode(SOC_GPIO_PIN_HELTRK_GNSS_EN, OUTPUT);
+        pinMode(SOC_GPIO_PIN_HELTRK_TFT_EN,  OUTPUT);
+        break;
+
+      case 23:
+        digitalWrite(SOC_GPIO_PIN_HELTRK_VEXT_EN, HIGH);
+
+        pinMode(SOC_GPIO_PIN_HELTRK_VFEM_EN, INPUT_PULLUP);
+        delay(1);
+        pinMode(SOC_GPIO_PIN_HELTRK_PA_CSD,  OUTPUT);
+        digitalWrite(SOC_GPIO_PIN_HELTRK_PA_CSD, HIGH);
+
+        digitalWrite(SOC_GPIO_PIN_HELTRK_PA_CTX, HIGH); // Receive Bypass Mode
+        pinMode(SOC_GPIO_PIN_HELTRK_PA_CTX,  OUTPUT);
+        break;
+
+      case 5:
+      default:
+        digitalWrite(SOC_GPIO_PIN_HELTRK_VEXT_EN, HIGH);
+        break;
+    }
+
     pinMode(SOC_GPIO_PIN_HELTRK_VEXT_EN,   OUTPUT);
 
     if (rtc_get_reset_reason(0) == POWERON_RESET) {
@@ -3728,6 +3766,11 @@ static void ESP32_fini(int reason)
     if (hw_info.revision < 5) {
       pinMode(SOC_GPIO_PIN_HELTRK_GNSS_EN, INPUT);
       pinMode(SOC_GPIO_PIN_HELTRK_TFT_EN,  INPUT);
+    }
+    if (hw_info.revision > 5) {
+      pinMode(SOC_GPIO_PIN_HELTRK_VFEM_EN, INPUT);
+      pinMode(SOC_GPIO_PIN_HELTRK_PA_CSD,  INPUT);
+      pinMode(SOC_GPIO_PIN_HELTRK_PA_CTX,  INPUT);
     }
 
     pinMode(SOC_GPIO_PIN_HELTRK_GNSS_RST,  INPUT);
@@ -5701,7 +5744,7 @@ static byte ESP32_Display_setup()
                  SOC_GPIO_PIN_T8_S2_TFT_BL :
                  (esp32_board == ESP32_HELTEC_TRACKER && hw_info.revision == 3) ?
                  SOC_GPIO_PIN_HELTRK_TFT_BL_V03 :
-                 (esp32_board == ESP32_HELTEC_TRACKER && hw_info.revision == 5) ?
+                 (esp32_board == ESP32_HELTEC_TRACKER && hw_info.revision >= 5) ?
                  SOC_GPIO_PIN_HELTRK_TFT_BL_V05 :
                  SOC_GPIO_PIN_TWATCH_TFT_BL;
 
@@ -6184,7 +6227,7 @@ static void ESP32_Display_fini(int reason)
                      SOC_GPIO_PIN_T8_S2_TFT_BL :
                      (esp32_board == ESP32_HELTEC_TRACKER && hw_info.revision == 3) ?
                      SOC_GPIO_PIN_HELTRK_TFT_BL_V03 :
-                     (esp32_board == ESP32_HELTEC_TRACKER && hw_info.revision == 5) ?
+                     (esp32_board == ESP32_HELTEC_TRACKER && hw_info.revision >= 5) ?
                      SOC_GPIO_PIN_HELTRK_TFT_BL_V05 :
                      SOC_GPIO_PIN_TWATCH_TFT_BL;
 
@@ -6528,7 +6571,11 @@ static bool ESP32_Baro_setup()
 
   } else if (esp32_board == ESP32_HELTEC_TRACKER) {
 
-    Wire.setPins(SOC_GPIO_PIN_HELTRK_SDA, SOC_GPIO_PIN_HELTRK_SCL);
+    if (hw_info.revision == 23) {
+      Wire.setPins(SOC_GPIO_PIN_HELTRK_V2_SDA, SOC_GPIO_PIN_HELTRK_V2_SCL);
+    } else {
+      Wire.setPins(SOC_GPIO_PIN_HELTRK_SDA, SOC_GPIO_PIN_HELTRK_SCL);
+    }
 
   } else if (esp32_board == ESP32_LILYGO_T3S3_EPD ||
              esp32_board == ESP32_LILYGO_T3S3_OLED) {
