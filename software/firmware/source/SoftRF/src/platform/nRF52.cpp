@@ -362,8 +362,15 @@ static unsigned long IMU_Time_Marker = 0;
 extern float IMU_g;
 #endif /* EXCLUDE_IMU */
 
+#if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
 #include <SensorDRV2605.hpp>
 SensorDRV2605 vibra;
+#endif /* (0, 3, 1) */
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
+#include <HapticDrivers.hpp>
+HapticDriver_DRV2605 vibra;
+#endif /* (0, 4, 1) */
+
 static bool nRF52_has_vibra = false;
 
 #include <AHT20.h>
@@ -814,12 +821,16 @@ static void nRF52_setup()
   pinMode(PIN_LED4, INPUT);
 
   nRF52_board = nRF52_bl_check("TECHOBOOT")   ? NRF52_LILYGO_TECHO_REV_2 :
+#if !defined(EXCLUDE_WIP)
+                nRF52_bl_check("T1000-E Pro") ? NRF52_SEEED_T1000E_PRO   :
+#endif /* EXCLUDE_WIP */
                 nRF52_bl_check("T1000-E")     ? NRF52_SEEED_T1000E       :
                 nRF52_bl_check("HT-n5262")    ? NRF52_HELTEC_T114        :
                 nRF52_bl_check("ThinkNodeM3") ? NRF52_ELECROW_TN_M3      :
                 nRF52_bl_check("ThinkNodeM6") ? NRF52_ELECROW_TN_M6      :
                 nRF52_bl_check("ELECROWBOOT") ? NRF52_ELECROW_TN_M1      :
 #if !defined(EXCLUDE_WIP)
+                nRF52_bl_check("T2000")       ? NRF52_SEEED_T2000        :
                 nRF52_bl_check("XIAO")        ? NRF52_SEEED_WIO_L1       : /* TBD */
 #endif /* EXCLUDE_WIP */
                 nRF52_board;
@@ -2000,18 +2011,18 @@ static void nRF52_setup()
 #if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
     nRF52_has_vibra = vibra.begin(Wire);
 #endif /* (0, 3, 1) */
-#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
     nRF52_has_vibra = vibra.begin(Wire, DRV2605_SLAVE_ADDRESS);
-#endif /* (0, 4, 0) */
+#endif /* (0, 4, 1) */
 
     if (nRF52_has_vibra) {
       vibra.selectLibrary(1);
 #if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
       vibra.setMode(SensorDRV2605::MODE_INTTRIG);
 #endif /* (0, 3, 1) */
-#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
       vibra.setMode(HapticMode::INTERNAL_TRIGGER);
-#endif /* (0, 4, 0) */
+#endif /* (0, 4, 1) */
 
       digitalWrite(SOC_GPIO_PIN_MOTOR_EN, HIGH);
       pinMode(SOC_GPIO_PIN_MOTOR_EN, OUTPUT);
@@ -2025,18 +2036,18 @@ static void nRF52_setup()
 #if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
     nRF52_has_vibra = vibra.begin(Wire);
 #endif /* (0, 3, 1) */
-#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
     nRF52_has_vibra = vibra.begin(Wire, DRV2605_SLAVE_ADDRESS);
-#endif /* (0, 4, 0) */
+#endif /* (0, 4, 1) */
 
     if (nRF52_has_vibra) {
       vibra.selectLibrary(1);
 #if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
       vibra.setMode(SensorDRV2605::MODE_INTTRIG);
 #endif /* (0, 3, 1) */
-#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
       vibra.setMode(HapticMode::INTERNAL_TRIGGER);
-#endif /* (0, 4, 0) */
+#endif /* (0, 4, 1) */
 
       hw_info.haptic = HAPTIC_DRV2605;
     }
@@ -2784,9 +2795,9 @@ static void nRF52_fini(int reason)
 #if SENSORLIB_VERSION == SENSORLIB_VERSION_VAL(0, 3, 1)
         vibra.setMode(1<<6); /* Standby */
 #endif /* (0, 3, 1) */
-#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 0)
+#if SENSORLIB_VERSION >= SENSORLIB_VERSION_VAL(0, 4, 1)
         vibra.setMode(HapticMode::STANDBY);
-#endif /* (0, 4, 0) */
+#endif /* (0, 4, 1) */
 
         if (nRF52_board == NRF52_LILYGO_TECHO_PLUS) {
           pinMode(SOC_GPIO_PIN_MOTOR_EN, INPUT);
