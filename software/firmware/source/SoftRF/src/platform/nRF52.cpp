@@ -321,6 +321,7 @@ ui_settings_t ui_settings = {
 
 ui_settings_t *ui;
 
+#include <SensorLib_Version.h>
 #if !defined(EXCLUDE_IMU)
 #define IMU_UPDATE_INTERVAL 500 /* ms */
 
