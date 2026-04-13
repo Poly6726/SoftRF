@@ -2477,8 +2477,8 @@ static void ESP32_setup()
         pinMode(SOC_GPIO_PIN_HELTRK_PA_CSD,  OUTPUT);
         digitalWrite(SOC_GPIO_PIN_HELTRK_PA_CSD, HIGH);
 
-        digitalWrite(SOC_GPIO_PIN_HELTRK_PA_CTX, HIGH); // Receive Bypass Mode
         pinMode(SOC_GPIO_PIN_HELTRK_PA_CTX,  OUTPUT);
+        digitalWrite(SOC_GPIO_PIN_HELTRK_PA_CTX, HIGH); // Receive Bypass Mode
         break;
 
       case 5:

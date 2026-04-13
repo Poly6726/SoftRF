@@ -44,9 +44,64 @@
 #define SOC_GPIO_PIN_EVK_IMU_INT        PIN_IMU_INT    //      P0.02 +
 #define SOC_GPIO_PIN_EVK_PDM_CLK        PIN_PDM_CLK    //      P1.12 +
 #define SOC_GPIO_PIN_EVK_PDM_DATA       PIN_PDM_DATA   //      P1.13 +
+#endif /* ARDUINO_XIAO_NRF54L15 */
 
-#else
+#if defined(ARDUINO_HOLYIOT_25007_NRF54L15) || \
+    defined(ARDUINO_GENERIC_NRF54L15_MODULE_36PIN)
+/* Peripherals */
+#define SOC_GPIO_PIN_CONS_EVK_RX        P1_08 // D19
+#define SOC_GPIO_PIN_CONS_EVK_TX        P1_09 // D18
 
+#define SOC_GPIO_PIN_GNSS_EVK_RX        P2_07 // D7
+#define SOC_GPIO_PIN_GNSS_EVK_TX        P2_08 // D6
+#define SOC_GPIO_PIN_GNSS_EVK_PPS       P2_10 // D13
+
+/* SPI */
+#define SOC_GPIO_PIN_EVK_MOSI           P2_02 // D10
+#define SOC_GPIO_PIN_EVK_MISO           P2_04 // D9
+#define SOC_GPIO_PIN_EVK_SCK            P2_01 // D8
+#define SOC_GPIO_PIN_EVK_SS             P1_07 // D3
+
+/* LR2021 */
+#define SOC_GPIO_PIN_EVK_RST            P1_06 // D2
+#define SOC_GPIO_PIN_EVK_DIO7           P2_07 // D6
+#define SOC_GPIO_PIN_EVK_DIO8           P1_04 // D0
+#define SOC_GPIO_PIN_EVK_DIO11          P2_08 // D7
+#define SOC_GPIO_PIN_EVK_BUSY           P1_05 // D1
+
+/* I2C */
+#define SOC_GPIO_PIN_EVK_SDA            P1_10 // D4
+#define SOC_GPIO_PIN_EVK_SCL            P1_11 // D5
+
+/* NFC */
+#define SOC_GPIO_PIN_NFC_ANT1           P1_02
+#define SOC_GPIO_PIN_NFC_ANT2           P1_03
+
+/* 32K XTAL */
+#define SOC_GPIO_PIN_32K_XL1            P1_00
+#define SOC_GPIO_PIN_32K_XL2            P1_01
+
+/* antenna switch */
+#define SOC_GPIO_PIN_EVK_ANT_SW         P2_05
+#define SOC_GPIO_PIN_EVK_ANT_PWR        P2_03
+
+#define SOC_GPIO_PIN_EVK_STATUS         P2_00 // D16
+#define SOC_GPIO_PIN_EVK_BUTTON         P0_00 // D17
+#define SOC_GPIO_PIN_EVK_BUZZER         SOC_GPIO_PIN_EVK_D15
+#define SOC_GPIO_PIN_EVK_BATTERY        P1_14 // A7
+#define SOC_GPIO_PIN_EVK_VBAT_EN        P1_15
+
+#define SOC_GPIO_PIN_EVK_D11            P0_03 // D11
+#define SOC_GPIO_PIN_EVK_D12            P0_04 // D12
+#define SOC_GPIO_PIN_EVK_BUTTON_AUX     P2_09 // D14, EVK, NO PULLUP
+#define SOC_GPIO_PIN_EVK_D15            P2_06 // D15
+
+#define SOC_GPIO_PIN_EVK_IMU_INT        P0_02
+#define SOC_GPIO_PIN_EVK_PDM_CLK        P1_12
+#define SOC_GPIO_PIN_EVK_PDM_DATA       P1_13
+#endif /* GENERIC */
+
+#if 0
 /* Peripherals */
 #define SOC_GPIO_PIN_CONS_EVK_RX        _PINNUM(1,  8) // D19, P1.08 +
 #define SOC_GPIO_PIN_CONS_EVK_TX        _PINNUM(1,  9) // D18, P1.09 +
@@ -98,6 +153,6 @@
 #define SOC_GPIO_PIN_EVK_IMU_INT        _PINNUM(0,  2) //      P0.02 +
 #define SOC_GPIO_PIN_EVK_PDM_CLK        _PINNUM(1, 12) //      P1.12 +
 #define SOC_GPIO_PIN_EVK_PDM_DATA       _PINNUM(1, 13) //      P1.13 +
-#endif /* ARDUINO_XIAO_NRF54L15 */
+#endif
 
 #define SOC_ADC_EVK_VOLTAGE_DIV         (2.0F)         // 10K + 10K voltage divider on VBAT

@@ -359,6 +359,21 @@ static void sx12xx_setup()
     LMIC.txpow = 2; /* 2 dBm is minimum for RFM95W on PA_BOOST pin */
     break;
   }
+
+#if defined(USE_FEM)
+  if (hw_info.model == SOFTRF_MODEL_MIDI && hw_info.revision == 23) {
+    const uint16_t tx_gain[22] = { 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+                                   14, 13, 13, 13, 12, 12, 11, 10, 9, 8, 7 };
+    uint16_t tx_gain_num = 22;
+    for (int radio_dbm = 0; radio_dbm < tx_gain_num; radio_dbm++) {
+        if (((radio_dbm + tx_gain[radio_dbm]) > LMIC.txpow) ||
+            ((radio_dbm == (tx_gain_num - 1)) && ((radio_dbm + tx_gain[radio_dbm]) <= LMIC.txpow))) {
+            LMIC.txpow -= tx_gain[radio_dbm];
+            break;
+        }
+    }
+  }
+#endif /* USE_FEM */
 }
 
 static void sx12xx_setvars()

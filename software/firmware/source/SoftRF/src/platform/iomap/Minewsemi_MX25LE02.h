@@ -36,9 +36,48 @@
 #define SOC_GPIO_PIN_MX25_BUTTON        PIN_SAMD11_TX  // D19, P1.08
 #define SOC_GPIO_PIN_MX25_BUZZER        PIN_D8         // D8,  P2.06
 #define SOC_GPIO_PIN_MX25_BATTERY       PIN_A7         // A7,  P1.14
+#endif /* ARDUINO_XIAO_NRF54L15 */
 
-#else
+#if defined(ARDUINO_HOLYIOT_25007_NRF54L15) || \
+    defined(ARDUINO_GENERIC_NRF54L15_MODULE_36PIN)
+/* Peripherals */
+#define SOC_GPIO_PIN_CONS_MX25_RX       P1_04 // +
+#define SOC_GPIO_PIN_CONS_MX25_TX       P1_05 // +
 
+#define SOC_GPIO_PIN_GNSS_MX25_RX       P2_07 // +
+#define SOC_GPIO_PIN_GNSS_MX25_TX       P2_08 // +
+#define SOC_GPIO_PIN_GNSS_MX25_PPS      P2_10 // +
+
+/* SPI */
+#define SOC_GPIO_PIN_MX25_MOSI          P2_02 // +
+#define SOC_GPIO_PIN_MX25_MISO          P2_04 // +
+#define SOC_GPIO_PIN_MX25_SCK           P2_01 // +
+#define SOC_GPIO_PIN_MX25_SS            P2_05 // -
+
+/* SX1262 */
+#define SOC_GPIO_PIN_MX25_RST           P2_00 // -
+#define SOC_GPIO_PIN_MX25_DIO1          P0_00 // -
+#define SOC_GPIO_PIN_MX25_BUSY          P0_01 // -
+
+/* I2C */
+#define SOC_GPIO_PIN_MX25_SDA           P1_10 // +
+#define SOC_GPIO_PIN_MX25_SCL           P1_11 // +
+
+/* LEDs */
+#define SOC_GPIO_LED_MX25_GREEN         P0_03 // (Green) -
+#define SOC_GPIO_LED_MX25_RED           P0_02 // (Red)   -
+#define SOC_GPIO_LED_MX25_BLUE          P0_04 // (Blue)  -
+
+/* antenna switch */
+#define SOC_GPIO_PIN_MX25_ANT_SW2       P2_03 // -
+
+#define SOC_GPIO_PIN_MX25_STATUS        SOC_GPIO_LED_MX25_GREEN
+#define SOC_GPIO_PIN_MX25_BUTTON        P1_08 // -
+#define SOC_GPIO_PIN_MX25_BUZZER        P2_06 // +
+#define SOC_GPIO_PIN_MX25_BATTERY       P1_14 // +
+#endif /* GENERIC */
+
+#if 0
 /* Peripherals */
 #define SOC_GPIO_PIN_CONS_MX25_RX       _PINNUM(1,  4) // P1.04 +
 #define SOC_GPIO_PIN_CONS_MX25_TX       _PINNUM(1,  5) // P1.05 +
@@ -74,4 +113,4 @@
 #define SOC_GPIO_PIN_MX25_BUTTON        _PINNUM(1,  8) // P1.08 -
 #define SOC_GPIO_PIN_MX25_BUZZER        _PINNUM(2,  6) // P2.06 +
 #define SOC_GPIO_PIN_MX25_BATTERY       _PINNUM(1, 14) // P1.14 +
-#endif /* ARDUINO_XIAO_NRF54L15 */
+#endif

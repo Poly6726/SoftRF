@@ -43,7 +43,9 @@
 #include "../driver/OLED.h"
 #endif /* USE_OLED */
 
-#if defined(ARDUINO_XIAO_NRF54L15)
+#if defined(ARDUINO_XIAO_NRF54L15)          || \
+    defined(ARDUINO_HOLYIOT_25007_NRF54L15) || \
+    defined(ARDUINO_GENERIC_NRF54L15_MODULE_36PIN)
 #include <variant.h>
 #include "nrf54l15_hal.h"
 
@@ -341,7 +343,7 @@ static void nRF54_setup()
 
       xiaoNrf54l15SetAntenna(XIAO_NRF54L15_ANTENNA_CERAMIC);
       #else
-      pinMode(SOC_GPIO_PIN_EVK_VBAT_EN,    INPUT_PULLDOWN);
+      // pinMode(SOC_GPIO_PIN_EVK_VBAT_EN,    INPUT_PULLDOWN);
 
       pinMode(SOC_GPIO_PIN_EVK_ANT_SW,     INPUT_PULLDOWN); /* ANT 1 */
       #endif /* ARDUINO_XIAO_NRF54L15 */
@@ -506,7 +508,7 @@ static void nRF54_fini(int reason)
       #if defined(ARDUINO_XIAO_NRF54L15)
       BoardControl::setBatterySenseEnabled(false);
       #else
-      pinMode(SOC_GPIO_PIN_EVK_VBAT_EN,      INPUT);
+      // pinMode(SOC_GPIO_PIN_EVK_VBAT_EN,      INPUT);
       pinMode(SOC_GPIO_PIN_EVK_ANT_SW,       INPUT);
       #endif /* ARDUINO_XIAO_NRF54L15 */
 

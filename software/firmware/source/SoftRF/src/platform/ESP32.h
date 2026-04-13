@@ -456,6 +456,7 @@ struct rst_info {
 #define EXCLUDE_SI446X
 #define EXCLUDE_SX1231
 #define EXCLUDE_SX1280
+#define USE_FEM
 #elif defined(CONFIG_IDF_TARGET_ESP32C3) || \
       defined(CONFIG_IDF_TARGET_ESP32C5) || \
       defined(CONFIG_IDF_TARGET_ESP32C6) || \
