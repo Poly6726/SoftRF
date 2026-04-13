@@ -30,69 +30,72 @@
 
 #include "TouchDrvInterface.hpp"
 
-#define CST816_SLAVE_ADDRESS    0x15
+static constexpr uint8_t  CST816_SLAVE_ADDRESS  = (0x15);
 
 class TouchDrvCST816 : public TouchDrvInterface
 {
 public:
-    TouchDrvCST816();
+    using TouchDrvInterface::getPoint;
+    /**
+     * @brief  Constructor for the touch driver
+     * @retval None
+     */
+    TouchDrvCST816() = default;
 
-    ~TouchDrvCST816();
+    /**
+     * @brief  Destructor for the touch driver
+     * @retval None
+     */
+    ~TouchDrvCST816() = default;
 
-#if defined(ARDUINO)
-    bool begin(TwoWire &wire, uint8_t address = CST816_SLAVE_ADDRESS, int sda = -1, int scl = -1);
-#elif defined(ESP_PLATFORM)
-#if defined(USEING_I2C_LEGACY)
-    bool begin(i2c_port_t port_num, uint8_t addr = CST816_SLAVE_ADDRESS, int sda = -1, int scl = -1);
-#else
-    bool begin(i2c_master_bus_handle_t handle, uint8_t addr = CST816_SLAVE_ADDRESS);
-#endif
-#endif
+    /**
+    * @brief Puts the touch driver to sleep
+    * @note This function puts the touch driver into sleep mode.
+    *       If the device does not have a reset pin connected, it cannot be woken up after being put
+    *       into sleep mode and must be powered on again.
+    * @retval None
+    */
+    void sleep() override;
 
-    bool begin(SensorCommCustom::CustomCallback callback,
-               SensorCommCustomHal::CustomHalCallback hal_callback,
-               uint8_t addr = CST816_SLAVE_ADDRESS);
+    /**
+     * @brief  Get the touch points
+     * @note   This function will retrieve the touch points from the touch driver.
+     * @retval A reference to the touch points.
+     */
+    const TouchPoints &getTouchPoints() override;
 
-    void reset();
+    /**
+    * @brief  Get the model name
+    * @note   This function will retrieve the model name from the touch driver.
+    * @retval The model name.
+    */
+    const char *getModelName() override;
 
-    uint8_t getPoint(int16_t *x_array, int16_t *y_array, uint8_t get_point);
+    /**
+     * @brief  Disable auto sleep mode
+     * @note   This function will disable the auto sleep mode of the touch driver.
+     *
+     * @retval None
+     */
+    void disableAutoSleep() ;
 
-    bool isPressed();
-
-    const char *getModelName();
-
-    void sleep();
-
-    void wakeup();
-
-    void idle();
-
-    uint8_t getSupportTouchPoint();
-
-    bool getResolution(int16_t *x, int16_t *y);
-
-    void setCenterButtonCoordinate(int16_t x, int16_t y);
-
-    void setHomeButtonCallback(HomeButtonCallback cb, void *user_data);
-
-    void disableAutoSleep();
-
-    void enableAutoSleep();
-
-    void setGpioCallback(CustomMode mode_cb,
-                         CustomWrite write_cb,
-                         CustomRead read_cb);
+    /**
+     * @brief  Enable auto sleep mode
+     * @note   This function will enable the auto sleep mode of the touch driver.
+     * @retval None
+     */
+    void enableAutoSleep() ;
 
 private:
-    bool initImpl();
+    bool initImpl(uint8_t) override;
+
+    void beforeBegin() override
+    {
+        _pinsCfg.rstHoldTimeMs = 30;
+        _pinsCfg.rstReleaseTimeMs = 50;
+    }
 
 protected:
-    std::unique_ptr<SensorCommBase> comm;
-    std::unique_ptr<SensorHal> hal;
-
-    int16_t _center_btn_x;
-    int16_t _center_btn_y;
-
     static constexpr uint8_t  CST8xx_REG_STATUS         = (0x00);
     static constexpr uint8_t  CST8xx_REG_XPOS_HIGH      = (0x03);
     static constexpr uint8_t  CST8xx_REG_XPOS_LOW       = (0x04);
@@ -107,12 +110,5 @@ protected:
     static constexpr uint8_t  CST716_CHIP_ID            = (0x20);
     static constexpr uint8_t  CST820_CHIP_ID            = (0xB7);
     static constexpr uint8_t  CST816D_CHIP_ID           = (0xB6);
-
+    static constexpr uint8_t  MAX_FINGER_NUM            = (1);
 };
-
-
-
-
-
-
-

@@ -30,70 +30,58 @@
 
 #include "TouchDrvInterface.hpp"
 
-#define CST226SE_SLAVE_ADDRESS      (0x5A)
+static constexpr uint8_t  CST226SE_SLAVE_ADDRESS =  (0x5A);
 
 class TouchDrvCST226 : public TouchDrvInterface
 {
 public:
+    using TouchDrvInterface::getPoint;
+    /**
+     * @brief  Constructor for the touch driver
+     * @retval None
+     */
+    TouchDrvCST226() = default;
 
-    TouchDrvCST226();
+    /**
+     * @brief  Destructor for the touch driver
+     * @retval None
+     */
+    ~TouchDrvCST226() = default;
 
-    ~TouchDrvCST226();
+    /**
+     * @brief  Reset the touch driver
+     * @note   This function will reset the touch driver by toggling the reset pin.
+     * @retval None
+     */
+    void reset() override;
 
-#if defined(ARDUINO)
-    bool begin(TwoWire &wire, uint8_t addr = CST226SE_SLAVE_ADDRESS, int sda = -1, int scl = -1);
-#elif defined(ESP_PLATFORM)
-#if defined(USEING_I2C_LEGACY)
-    bool begin(i2c_port_t port_num, uint8_t addr = CST226SE_SLAVE_ADDRESS, int sda = -1, int scl = -1);
-#else
-    bool begin(i2c_master_bus_handle_t handle, uint8_t addr = CST226SE_SLAVE_ADDRESS);
-#endif
-#endif
+    /**
+    * @brief Puts the touch driver to sleep
+    * @note This function puts the touch driver into sleep mode.
+    *       If the device does not have a reset pin connected, it cannot be woken up after being put
+    *       into sleep mode and must be powered on again.
+    * @retval None
+    */
+    void sleep() override;
 
+    /**
+     * @brief  Get the touch points
+     * @note   This function will retrieve the touch points from the touch driver.
+     * @retval A reference to the touch points.
+     */
+    const TouchPoints &getTouchPoints() override;
 
-    bool begin(SensorCommCustom::CustomCallback callback,
-               SensorCommCustomHal::CustomHalCallback hal_callback,
-               uint8_t addr = CST226SE_SLAVE_ADDRESS);
-
-    void reset();
-
-    uint8_t getPoint(int16_t *x_array, int16_t *y_array, uint8_t get_point);
-
-    bool isPressed();
-
-    const char *getModelName();
-
-    void sleep();
-
-    void wakeup();
-
-    void idle();
-
-    uint8_t getSupportTouchPoint();
-
-    bool getResolution(int16_t *x, int16_t *y);
-
-    void setHomeButtonCallback(HomeButtonCallback cb, void *user_data);
-
-    void setGpioCallback(CustomMode mode_cb,
-                         CustomWrite write_cb,
-                         CustomRead read_cb);
+    /**
+    * @brief  Get the model name
+    * @note   This function will retrieve the model name from the touch driver.
+    * @retval The model name.
+    */
+    const char *getModelName() override;
 
 private:
-    bool initImpl();
-protected:
-    std::unique_ptr<SensorCommBase> comm;
-    std::unique_ptr<SensorHal> hal;
-    TouchData report;
     static constexpr uint8_t  CST226SE_CHIPTYPE   =  (0xA8);
+    static constexpr uint8_t  CST328_CHIPTYPE     =  (0x48);
+    static constexpr uint8_t  MAX_FINGER_NUM      =  (5);
+
+    bool initImpl(uint8_t) override;
 };
-
-
-
-
-
-
-
-
-
-

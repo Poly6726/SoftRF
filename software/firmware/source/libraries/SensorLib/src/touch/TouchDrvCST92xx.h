@@ -28,140 +28,104 @@
  */
 #pragma once
 
-#include "REG/CST9xxConstants.h"
 #include "TouchDrvInterface.hpp"
+    
+static constexpr uint8_t   CST92XX_SLAVE_ADDRESS = (0x5A);
 
-#define CST92XX_SLAVE_ADDRESS      (0x5A)
-
-class TouchDrvCST92xx : public TouchDrvInterface, public CST92xxConstants
+class TouchDrvCST92xx : public TouchDrvInterface
 {
 public:
-
+    using TouchDrvInterface::getPoint;
     enum CST92_RunMode {
-        CST92_MODE_NORMAL = (0x00),
-        CST92_MODE_LOW_POWER = (0X01),
-        CST92_MODE_DEEP_SLEEP = (0X02),
-        CST92_MODE_WAKEUP = (0x03),
-        CST92_MODE_DEBUG_DIFF = (0x04),
-        CST92_MODE_DEBUG_RAWDATA = (0X05),
-        CST92_MODE_FACTORY = (0x06),
-        CST92_MODE_DEBUG_INFO = (0x07),
-        CST92_MODE_UPDATE_FW = (0x08),
-        CST92_MODE_FACTORY_HIGHDRV = (0x10),
-        CST92_MODE_FACTORY_LOWDRV = (0x11),
-        CST92_MODE_FACTORY_SHORT = (0x12),
-        CST92_MODE_LPSCAN = (0x13),
+        MODE_NORMAL = (0x00),
+        MODE_LOW_POWER = (0X01),
+        MODE_DEEP_SLEEP = (0X02),
+        MODE_WAKEUP = (0x03),
+        MODE_DEBUG_DIFF = (0x04),
+        MODE_DEBUG_RAWDATA = (0X05),
+        MODE_FACTORY = (0x06),
+        MODE_DEBUG_INFO = (0x07),
+        MODE_UPDATE_FW = (0x08),
+        MODE_FACTORY_HIGH_DRV = (0x10),
+        MODE_FACTORY_LOW_DRV = (0x11),
+        MODE_FACTORY_SHORT = (0x12),
+        MODE_LPSCAN = (0x13),
     };
 
+    /**
+    * @brief  Constructor for the touch driver
+    * @retval None
+    */
     TouchDrvCST92xx();
 
-    ~TouchDrvCST92xx();
+    /**
+    * @brief  Destructor for the touch driver
+    * @retval None
+    */
+    ~TouchDrvCST92xx() = default;
 
-#if defined(ARDUINO)
-    bool begin(TwoWire &wire, uint8_t address = CST92XX_SLAVE_ADDRESS, int sda = -1, int scl = -1);
-#elif defined(ESP_PLATFORM)
-#if defined(USEING_I2C_LEGACY)
-    bool begin(i2c_port_t port_num, uint8_t addr = CST92XX_SLAVE_ADDRESS, int sda = -1, int scl = -1);
-#else
-    bool begin(i2c_master_bus_handle_t handle, uint8_t addr = CST92XX_SLAVE_ADDRESS);
-#endif
-#endif
+    /**
+    * @brief Puts the touch driver to sleep
+    * @note This function puts the touch driver into sleep mode.
+    *       If the device does not have a reset pin connected, it cannot be woken up after being put
+    *       into sleep mode and must be powered on again.
+    * @retval None
+    */
+    void sleep() override;
 
-    bool begin(SensorCommCustom::CustomCallback callback,
-               SensorCommCustomHal::CustomHalCallback hal_callback,
-               uint8_t addr = CST92XX_SLAVE_ADDRESS);
+    /**
+     * @brief  Get the touch points
+     * @note   This function will retrieve the touch points from the touch driver.
+     * @retval A reference to the touch points.
+     */
+    const TouchPoints &getTouchPoints() override;
 
-    void reset();
+    /**
+    * @brief  Get the model name
+    * @note   This function will retrieve the model name from the touch driver.
+    * @retval The model name.
+    */
+    const char *getModelName() override;
 
-    uint8_t getPoint(int16_t *x_array, int16_t *y_array, uint8_t get_point);
-
-    bool isPressed();
-
-    const char *getModelName();
-
-    void sleep();
-
-    void wakeup();
-
-    void idle();
-
-    uint8_t getSupportTouchPoint();
-
-    bool getResolution(int16_t *x, int16_t *y);
-
+    /**
+     * @brief  Set the cover screen callback
+     * @note   This function will set the callback function for the cover screen.
+     * @param  cb: The callback function to be set
+     * @param  *user_data: Pointer to user data to be passed to the callback function
+     * @retval None
+     */
     void setCoverScreenCallback(HomeButtonCallback cb, void *user_data = NULL);
 
-    void setGpioCallback(CustomMode mode_cb,
-                         CustomWrite write_cb,
-                         CustomRead read_cb);
-
 private:
-
-
-
+    bool initImpl(uint8_t) override;
     bool setMode(uint8_t mode);
     bool enterBootloader();
     bool getAttribute();
     uint32_t readWordFromMem(uint8_t type, uint16_t mem_addr);
-    void parseFingerData(uint8_t *data,  cst9xx_point_t *point);
-    uint32_t get_u32_from_ptr(const void *ptr);
-
-
-#if 0  /*DISABLE UPDATE FIRMWARE*/
-
-    struct {
-        bool firmware_info_ok;
-        uint32_t firmware_ic_type;
-        uint32_t firmware_version;
-        uint32_t firmware_checksum;
-        uint32_t firmware_project_id;
-        uint8_t tx_num;
-        uint8_t rx_num;
-        uint8_t key_num;
-    } IC_firmware;
-
-    struct {
-        bool ok;
-        uint8_t *head_data;
-        uint8_t *data;
-        uint32_t checksum;
-        uint32_t version;
-        uint32_t project_id;
-        uint32_t chip_type;
-    } bin_data;
-
-    bool getFirmwareInfo(void);
-    int16_t eraseMem(void);
-    int16_t writeSRAM(uint8_t *buf, uint16_t len);
-    int16_t writeMemPage(uint16_t addr, uint8_t *buf, uint16_t len) ;
-    int16_t writeMemAll(void) ;
-    int16_t calculateVerifyChecksum(void) ;
-    int16_t upgradeFirmware(void);
-    uint32_t verifyFirmware(uint8_t *pdata, uint16_t order);
-    int16_t parseFirmware(void);
-    int16_t upgradeFirmwareJudge(void);
-    int16_t getFirmwareAddress(uint8_t data_seq, uint16_t data_len) ;
-    int16_t updateFirmware(void);
-#endif
-
-
     uint32_t getChipType();
-    bool initImpl();
-
-    uint16_t chipType;
 
 protected:
-    std::unique_ptr<SensorCommBase> comm;
-    std::unique_ptr<SensorHal> hal;
-
     int _slave_addr;
-    int16_t _center_btn_x;
-    int16_t _center_btn_y;
+    uint16_t chipType;
+
+    static constexpr uint16_t  CST9220_CHIP_ID             = (0x9220);
+    static constexpr uint16_t  CST9217_CHIP_ID             = (0x9217);
+    
+    static constexpr uint16_t  REG_READ                    = (0xD000);
+    static constexpr uint16_t  REG_DEBUG_MODE              = (0xD101);
+    static constexpr uint16_t  REG_SLEEP_MODE              = (0xD105);
+    static constexpr uint16_t  REG_DIS_LOW_POWER_SCAN_MODE = (0xD106);
+    static constexpr uint16_t  REG_NORMAL_MODE             = (0xD109);
+    static constexpr uint16_t  REG_RAW_MODE                = (0xD10A);
+    static constexpr uint16_t  REG_DIFF_MODE               = (0xD10D);
+    static constexpr uint16_t  REG_BASE_LINE_MODE          = (0xD10E);
+    static constexpr uint16_t  REG_LOW_POWER_MODE          = (0xD10F);
+    static constexpr uint16_t  REG_FACTORY_MODE            = (0xD114);
+    
+    static constexpr uint8_t   CST92XX_BOOT_ADDRESS        = (0x5A);
+    static constexpr uint8_t   CST92XX_ACK                 = (0xAB);
+    static constexpr uint32_t  CST92XX_MEM_SIZE            = (0x007F80);// 31KB
+
+    static constexpr uint8_t   MAX_FINGER_NUM              = (2);
+    static constexpr uint8_t   PROGRAM_PAGE_SIZE           = (128);
 };
-
-
-
-
-
-
-

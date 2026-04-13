@@ -33,6 +33,7 @@
 #include "platform/arduino/SensorCommArduino_HW.hpp"
 #include "platform/arduino/SensorCommArduino_I2C.hpp"
 #include "platform/arduino/SensorCommArduino_SPI.hpp"
+#include "platform/arduino/StreamArduinoAdapter.hpp"
 #elif !defined(ARDUINO)  && defined(ESP_PLATFORM)
 #include "platform/espidf/SensorCommEspIDF_HW.hpp"
 #include "platform/espidf/SensorCommEspIDF_I2C.hpp"
@@ -42,6 +43,7 @@
 #include "platform/SensorCommCustomHal.hpp"
 #include "platform/SensorCommDebug.hpp"
 #include "platform/SensorCommStatic.hpp"
+#include <assert.h>
 
 enum CommInterface {
     COMM_CUSTOM = 0,
@@ -113,4 +115,16 @@ bool beginCommCustomCallback(CommInterface interface,
     }
     comm->init();
     return true;
+}
+
+inline void addrToBeBuf(uint32_t addr, uint8_t buf[4]) {
+    buf[0] = (addr >> 24) & 0xFF;
+    buf[1] = (addr >> 16) & 0xFF;
+    buf[2] = (addr >> 8) & 0xFF;
+    buf[3] = addr & 0xFF;
+}
+
+inline void addrToBeBuf(uint16_t addr, uint8_t buf[2]) {
+    buf[0] = (addr >> 8) & 0xFF;
+    buf[1] = addr & 0xFF;
 }

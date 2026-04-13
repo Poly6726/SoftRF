@@ -33,7 +33,7 @@
 /** Major version number (X.x.x) */
 #define SENSORLIB_VERSION_MAJOR   0
 /** Minor version number (x.X.x) */
-#define SENSORLIB_VERSION_MINOR   3
+#define SENSORLIB_VERSION_MINOR   4
 /** Patch version number (x.x.X) */
 #define SENSORLIB_VERSION_PATCH   1
 
@@ -53,4 +53,4 @@
                                              SENSORLIB_VERSION_MINOR, \
                                              SENSORLIB_VERSION_PATCH)
 
-#define SENSORLIB_VERSION_STR   "v0.3.0"
+#define SENSORLIB_VERSION_STR   "v0.4.1"
