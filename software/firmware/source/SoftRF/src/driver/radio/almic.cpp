@@ -315,6 +315,11 @@ static void sx12xx_setup()
 
   RF_FreqPlan.setPlan(settings->band, settings->rf_protocol);
 
+#if defined(USE_FEM)
+  bool has_fem = hw_info.model == SOFTRF_MODEL_MIDI && hw_info.revision == 23 ?
+                 true : false;
+#endif /* USE_FEM */
+
   switch(settings->txpower)
   {
   case RF_TX_POWER_FULL:
@@ -322,25 +327,33 @@ static void sx12xx_setup()
     /* Load regional max. EIRP at first */
     LMIC.txpow = RF_FreqPlan.MaxTxPower;
 
-    if (rf_chip->type == RF_IC_SX1262) {
-      /* SX1262 is unable to give more than 22 dBm */
-      if (LMIC.txpow > 22)
-        LMIC.txpow = 22;
-    } else {
-      /* SX1276 is unable to give more than 20 dBm */
-      if (LMIC.txpow > 20)
-        LMIC.txpow = 20;
-    }
+#if defined(USE_FEM)
+    if (has_fem == true) {
+      if (LMIC.txpow > 28)
+        LMIC.txpow = 28;
+    } else
+#endif /* USE_FEM */
+    {
+      if (rf_chip->type == RF_IC_SX1262) {
+        /* SX1262 is unable to give more than 22 dBm */
+        if (LMIC.txpow > 22)
+          LMIC.txpow = 22;
+      } else {
+        /* SX1276 is unable to give more than 20 dBm */
+        if (LMIC.txpow > 20)
+          LMIC.txpow = 20;
+      }
 
 #if 1
-    /*
-     * Enforce Tx power limit until confirmation
-     * that RFM95W is doing well
-     * when antenna is not connected
-     */
-    if (LMIC.txpow > 17)
-      LMIC.txpow = 17;
+      /*
+       * Enforce Tx power limit until confirmation
+       * that RFM95W is doing well
+       * when antenna is not connected
+       */
+      if (LMIC.txpow > 17)
+        LMIC.txpow = 17;
 #endif
+    }
 
     /* Enforce Tx power limit for a limb-worn (handheld or wristband) device */
 #if 0
